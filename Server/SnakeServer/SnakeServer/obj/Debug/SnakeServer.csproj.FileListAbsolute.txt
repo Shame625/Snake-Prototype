@@ -1,0 +1,7 @@
+C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\bin\Debug\SnakeServer.exe.config
+C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\bin\Debug\SnakeServer.exe
+C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\bin\Debug\SnakeServer.pdb
+C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.csprojResolveAssemblyReference.cache
+C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.csproj.CoreCompileInputs.cache
+C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.exe
+C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.pdb
