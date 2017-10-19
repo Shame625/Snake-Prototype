@@ -40,3 +40,6 @@ sysinfo.txt
 *.cache
 *.bin
 *.log
+*.ide
+*.exe
+*.ide

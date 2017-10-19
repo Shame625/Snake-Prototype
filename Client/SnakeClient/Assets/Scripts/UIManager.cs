@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -80,10 +81,14 @@ public class UIManager : MonoBehaviour
         statusTextConnection.text = Constants.CONNECTION_LOST;
     }
 
-    public void UserNameErrorUI()
+    public void UserNameErrorUI(ref UInt16 err)
     {
-        userNameTextStatus.text = "User Name must be between " + Constants.USERNAME_LENGTH_MIN + " and " +
-                                  Constants.USERNAME_LENGTH_MAX + " characters long and cannot contain special characters!";
+        if (err == Constants.USERNAME_BAD)
+            userNameTextStatus.text = "User Name must be between " + Constants.USERNAME_LENGTH_MIN + " and " +
+                                      Constants.USERNAME_LENGTH_MAX + " characters long and cannot contain special characters!";
+
+        else if (err == Constants.USERNAME_IN_USE)
+            userNameTextStatus.text = "User Name already in use!";
     }
 
     public string GetNameFromInputField()

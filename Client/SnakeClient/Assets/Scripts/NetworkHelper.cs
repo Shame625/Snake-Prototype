@@ -77,9 +77,9 @@ public class NetworkHelper : MonoBehaviour
         uiManager.DisplayMainMenuUI();
     }
 
-    public void userNameBAD()
+    public void userNameBAD(UInt16 err)
     {
-        uiManager.UserNameErrorUI();
+        uiManager.UserNameErrorUI(ref err);
     }
 
     public void BytesToMessageLength(ref byte[] msg, ref byte[] len, ref UInt16 msgNo, ref UInt16 length)

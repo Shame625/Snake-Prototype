@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace SnakeServer
@@ -10,6 +11,12 @@ namespace SnakeServer
             return (BitConverter.ToUInt16(msg, 0), BitConverter.ToUInt16(len, 0));
         }
 
+        public static bool CheckIfUserNameInUse(ref string name, ref Dictionary<string, bool> dict)
+        {
+            if(dict.ContainsKey(name))
+                return true;
+            return false;
+        }
 
         public string PrintBytes(ref byte[] byteArray)
         {
@@ -27,7 +34,7 @@ namespace SnakeServer
             return sb.ToString();
         }
 
-        public void PrintRecievedData(int clientId, UInt16 messageNO, UInt16 packetLength, ref byte[] data)
+        public void PrintRecievedData(int clientId, UInt16 messageNO, UInt16 packetLength, ref byte[] data, ref byte[] fullDump)
         {
             Console.WriteLine("------------------------------------------------------------------------------");
             Console.WriteLine("Counter: " + Program.counter + " Date / Time: " + DateTime.Now);
@@ -35,6 +42,7 @@ namespace SnakeServer
             Console.WriteLine(string.Format("Recieved data from client: {0}", clientId));
             Console.WriteLine(string.Format("Message number: {0} Packet Length: {1}\n", messageNO, packetLength));
             Console.WriteLine(string.Format("Data\nHex: {0}\nString: {1}\n", PrintBytes(ref data), Encoding.ASCII.GetString(data)));
+            Console.WriteLine(string.Format("Full byte dump:\n{0}\n", PrintBytes(ref fullDump)));
         }
 
         public void PrintSendingData(int clientId, UInt16 messageNO, UInt16 packetLength, ref byte[] data)

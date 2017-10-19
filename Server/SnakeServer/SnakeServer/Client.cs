@@ -4,17 +4,19 @@ using System.Net.Sockets;
 
 namespace SnakeServer
 {
-    class Client
+    
+    public class Client
     {
         public int _clientId { get; }
-        Socket _socket { get; }
+        public Socket _socket { get; set; }
         public string _userName { get; set; }
-        private bool _isAllowed = false;
+        public bool _isAllowed{ get; set; }
 
         public Client(int id, Socket socket)
         {
             _clientId = id;
             _socket = socket;
+            _isAllowed = false;
         }
 
         public UInt16 SetName(ref string name)
@@ -23,9 +25,12 @@ namespace SnakeServer
                 return Constants.USERNAME_BAD;
             else if (_isAllowed)
                 return Constants.USER_LOGGED_IN;
+            else if (ServerHelper.CheckIfUserNameInUse(ref name, ref Program._usedNames))
+                return Constants.USERNAME_IN_USE;
 
             _isAllowed = true;
             _userName = name;
+            Program._usedNames.Add(name, true);
 
             return Constants.USERNAME_OK;
         }

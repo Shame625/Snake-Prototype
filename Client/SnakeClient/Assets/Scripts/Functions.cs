@@ -24,6 +24,13 @@ public class Functions : MonoBehaviour
             networkManager.SendPacket(ref dataToSend);
     }
 
+    public void Logout()
+    {
+        byte[] dataToSend = packetHelper.UInt16ToBytes(Messages.LOGOUT, Constants.LOGOUT_CODE);
+        Debug.Log(PrintBytes(ref dataToSend));
+        networkManager.SendPacket(ref dataToSend);
+    }
+
     public string PrintBytes(ref byte[] byteArray)
     {
         var sb = new StringBuilder("new byte[] { ");

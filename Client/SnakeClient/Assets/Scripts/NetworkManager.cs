@@ -123,7 +123,7 @@ public class NetworkManager : MonoBehaviour
                             {
                                 UnityThreadHelper.Dispatcher.Dispatch(() =>
                                 {
-                                    networkHelper.userNameBAD();
+                                    networkHelper.userNameBAD(server_response);
                                 });
                             }
                         }

@@ -13,6 +13,7 @@ namespace SnakeServer
         private static byte[] _buffer = new byte[1024];
 
         private static Dictionary<int, Client> _connectedClients = new Dictionary<int, Client>();
+        public static Dictionary<string, bool> _usedNames = new Dictionary<string, bool>();
         private static Socket _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
         private static ServerHelper serverHelper = new ServerHelper();
@@ -52,11 +53,15 @@ namespace SnakeServer
         {
             try
             {
+                
                 Socket socket = (Socket)AR.AsyncState;
+
                 int recieved = socket.EndReceive(AR);
 
                 if (recieved == 0)
                 {
+                    RemoveClient(ref socket, true);
+
                     return;
                 }
                 else if(recieved > 1024)
@@ -90,7 +95,7 @@ namespace SnakeServer
                 int clientId = socket.GetHashCode();
 
                 //Print to console recieved data
-                serverHelper.PrintRecievedData(clientId, message_number, packet_length, ref data);
+                serverHelper.PrintRecievedData(clientId, message_number, packet_length, ref data, ref dataBuff);
 
                 //Packet handling recieving/sending
                 UInt16 message_number_send = UInt16.MaxValue;
@@ -112,6 +117,12 @@ namespace SnakeServer
                             }
                             break;
                         }
+
+                    case Messages.LOGOUT:
+                        {
+                            RemoveClient(ref socket, false);
+                            break;
+                        }
                     default:
 
                         break;
@@ -127,6 +138,7 @@ namespace SnakeServer
                     serverHelper.PrintSendingData(clientId, message_number_send, lengthToSend, ref dataToSend);
                     socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
                 }
+
                 socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(RecieveCallback), socket);
             }
 
@@ -156,5 +168,35 @@ namespace SnakeServer
                 Console.WriteLine(ex.Message);
             }
         }
+
+        private static void RemoveClient(ref Socket socket, bool forced)
+        {
+            Console.WriteLine("Date / Time: " + DateTime.Now);
+
+            if (forced)
+            {
+                Console.WriteLine("User ID: " + socket.GetHashCode() + " forcibly disconnected!");
+                if (_connectedClients.ContainsKey(socket.GetHashCode()))
+                {
+                    _connectedClients[socket.GetHashCode()]._socket.Shutdown(SocketShutdown.Both);
+                    _connectedClients[socket.GetHashCode()]._socket.Disconnect(true);
+                }
+            }
+            else
+            {
+                Console.WriteLine("User ID: " + socket.GetHashCode() + " gracefully disconnected!");
+            }
+
+            if (_connectedClients.ContainsKey(socket.GetHashCode()))
+            {
+                if (_connectedClients[socket.GetHashCode()]._userName != null)
+                {
+                    if (_usedNames.ContainsKey(_connectedClients[socket.GetHashCode()]._userName))
+                        _usedNames.Remove(_connectedClients[socket.GetHashCode()]._userName);
+                }
+                _connectedClients.Remove(socket.GetHashCode());
+            }
+        }
     }
+
 }
