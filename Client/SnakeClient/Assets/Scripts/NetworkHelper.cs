@@ -1,12 +1,18 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class NetworkHelper : MonoBehaviour
 {
     bool isLoopInvoked = false;
+
+    NetworkManager networkManager;
+    GameManager gameManager;
     UIManager uiManager;
 
     private void Awake()
     {
+        networkManager = GetComponent<NetworkManager>();
+        gameManager = GetComponent<GameManager>();
         uiManager = GetComponent<UIManager>();    
     }
 
@@ -14,7 +20,7 @@ public class NetworkHelper : MonoBehaviour
     {
         uiManager.ConnectUI();
 
-        NetworkManager.Instance.attempts = 0;
+        networkManager.attempts = 0;
 
         if (!isLoopInvoked)
             InvokeRepeating("CheckConnection", 0, 1);
@@ -24,7 +30,7 @@ public class NetworkHelper : MonoBehaviour
 
     public void ConnectionHeartbeat()
     {
-        if (!NetworkManager.Instance.GetStatusConnection())
+        if (!networkManager.GetStatusConnection())
         {
             uiManager.DisconnectedFromServerUI();
             CancelInvoke("ConnectionHeartbeat");
@@ -33,7 +39,7 @@ public class NetworkHelper : MonoBehaviour
 
     void CheckConnection()
     {
-        if (NetworkManager.Instance.attempts == Constants.LOOP_MAX)
+        if (networkManager.attempts == Constants.LOOP_MAX)
         {
             uiManager.CheckConnectionUI();
             isLoopInvoked = false;
@@ -42,7 +48,7 @@ public class NetworkHelper : MonoBehaviour
             return;
         }
 
-        if (NetworkManager.Instance.GetStatusConnection())
+        if (networkManager.GetStatusConnection())
         {
             CancelInvoke("CheckConnection");
             InvokeRepeating("ConnectionHeartbeat", 0, 5);
@@ -53,15 +59,32 @@ public class NetworkHelper : MonoBehaviour
         }
         else
         {
-            NetworkManager.Instance.LoopConnect();
-            NetworkManager.Instance.attempts++;
+            networkManager.LoopConnect();
+            networkManager.attempts++;
 
-            if (NetworkManager.Instance.attempts == 1)
+            if (networkManager.attempts == 1)
             {
                 uiManager.DisplayConnectToServerPanelUI();
             }
         }
 
         uiManager.CheckConnectionUI();
+    }
+
+    public void userNameOK()
+    {
+        gameManager.player.SetName(ref gameManager.enteredName);
+        uiManager.DisplayMainMenuUI();
+    }
+
+    public void userNameBAD()
+    {
+        uiManager.UserNameErrorUI();
+    }
+
+    public void BytesToMessageLength(ref byte[] msg, ref byte[] len, ref UInt16 msgNo, ref UInt16 length)
+    {
+        msgNo = BitConverter.ToUInt16(msg, 0);
+        length = BitConverter.ToUInt16(len, 0);
     }
 }

@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class Functions : MonoBehaviour
 {
+    private NetworkManager networkManager;
     private UIManager uiManager;
     private PacketHelper packetHelper;
 
     private void Awake()
     {
+        networkManager = GetComponent<NetworkManager>();
         uiManager = GetComponent<UIManager>();
         packetHelper = new PacketHelper();
     }
@@ -19,16 +21,7 @@ public class Functions : MonoBehaviour
             name = uiManager.GetNameFromInputField();
 
             byte[] dataToSend = packetHelper.StringToBytes(Messages.SET_NAME_REQUEST, ref name);
-
-            byte[] temp = new byte[2];
-            temp[0] = dataToSend[2];
-            temp[1] = dataToSend[3];
-
-            Debug.Log(BitConverter.ToUInt16(temp, 0));
-
-            Debug.Log(PrintBytes(ref dataToSend));
-
-            NetworkManager.Instance.SendPacket(ref dataToSend);
+            networkManager.SendPacket(ref dataToSend);
     }
 
     public string PrintBytes(ref byte[] byteArray)

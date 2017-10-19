@@ -17,7 +17,7 @@ namespace SnakeServer
             for (var i = 0; i < byteArray.Length; i++)
             {
                 var b = byteArray[i];
-                sb.Append(b);
+                sb.Append(b.ToString("X"));
                 if (i < byteArray.Length - 1)
                 {
                     sb.Append(", ");
@@ -30,18 +30,18 @@ namespace SnakeServer
         public void PrintRecievedData(int clientId, UInt16 messageNO, UInt16 packetLength, ref byte[] data)
         {
             Console.WriteLine("------------------------------------------------------------------------------");
-            Console.WriteLine("Counter: " + Program.counter);
+            Console.WriteLine("Counter: " + Program.counter + " Date / Time: " + DateTime.Now);
             Console.WriteLine("------------------------------------------------------------------------------");
             Console.WriteLine(string.Format("Recieved data from client: {0}", clientId));
             Console.WriteLine(string.Format("Message number: {0} Packet Length: {1}\n", messageNO, packetLength));
-            Console.WriteLine(string.Format("Data\nHex:{0}\nString:{1}\n", PrintBytes(ref data), Encoding.ASCII.GetString(data)));
+            Console.WriteLine(string.Format("Data\nHex: {0}\nString: {1}\n", PrintBytes(ref data), Encoding.ASCII.GetString(data)));
         }
 
         public void PrintSendingData(int clientId, UInt16 messageNO, UInt16 packetLength, ref byte[] data)
         {
             Console.WriteLine(string.Format("Sending data to client: {0}", clientId));
-            Console.WriteLine(string.Format("Message number: {0} Packet Length: {1}\n", messageNO, packetLength + 4));
-            Console.WriteLine(string.Format("Data\nHex:{0}\nString:{1}\n", PrintBytes(ref data), Encoding.ASCII.GetString(data)));
+            Console.WriteLine(string.Format("Message number: {0} Packet Length: {1}\n", messageNO, packetLength));
+            Console.WriteLine(string.Format("Data\nHex: {0}\nString: {1}\n", PrintBytes(ref data), Encoding.ASCII.GetString(data)));
             Console.WriteLine("------------------------------------------------------------------------------");
         }
     }

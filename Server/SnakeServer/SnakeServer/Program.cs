@@ -105,10 +105,10 @@ namespace SnakeServer
                             string temp_name = Encoding.ASCII.GetString(data);
                             UInt16 response = _connectedClients[clientId].SetName(ref temp_name);
 
-                            //Send Data
+                            //Generating send data
                             {
                                 message_number_send = Messages.SET_NAME_RESPONSE;
-                                (lengthToSend, dataToSendTemp) = packetHelper.sendUInt16(message_number_send, response);
+                                (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, response);
                             }
                             break;
                         }

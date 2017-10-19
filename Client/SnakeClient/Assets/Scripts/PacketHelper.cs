@@ -17,6 +17,11 @@ public class PacketHelper
         return dataToSend;
     }
 
+    public UInt16 BytesToUInt16(ref byte[] data)
+    {
+        return BitConverter.ToUInt16(data, 0);
+    }
+
     void FillHeader(ref UInt16 messageNo, ref UInt16 len, ref byte[] data)
     {
         byte[] message_bytes = new byte[2];

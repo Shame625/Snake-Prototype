@@ -4,11 +4,18 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public NetworkManager networkManager;
     private NetworkHelper networkHelper;
+
+    public Player player;
+
+    public string enteredName;
 
     private void Awake()
     {
+        networkManager = GetComponent<NetworkManager>();
         networkHelper = GetComponent<NetworkHelper>();
+        player = new Player();
     }
 
     private void Start()
