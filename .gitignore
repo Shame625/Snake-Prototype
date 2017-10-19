@@ -32,3 +32,11 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+*.ide
+*.ide
+*.meta
+*.info
+*.exe
+*.cache
+*.bin
+*.log

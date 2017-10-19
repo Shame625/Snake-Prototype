@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
 public sealed class NetworkManager : MonoBehaviour
 {
-    [SerializeField]
-    UIManager uiManager;
-
     private static readonly NetworkManager instance = new NetworkManager();
     private static Socket _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -18,15 +13,10 @@ public sealed class NetworkManager : MonoBehaviour
 
     public int attempts = 0;
 
-    private void Awake()
-    {
-        uiManager = GetComponent<UIManager>();
-    }
-
     public void LoopConnect()
     {
-            var endPoint = new IPEndPoint(IPAddress.Loopback, 100);
-            _clientSocket.BeginConnect(endPoint, ConnectCallback, null);
+        var endPoint = new IPEndPoint(IPAddress.Loopback, 100);
+        _clientSocket.BeginConnect(endPoint, ConnectCallback, null);
     }
 
 
@@ -46,6 +36,12 @@ public sealed class NetworkManager : MonoBehaviour
         {
             Debug.Log(ex.Message);
         }
+    }
+
+    public void SendPacket(ref byte[] data)
+    {
+        _clientSocket.Send(data);
+        _clientSocket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), this);
     }
 
     private void ReceiveCallback(IAsyncResult AR)
@@ -84,7 +80,8 @@ public sealed class NetworkManager : MonoBehaviour
     {
         Array.Clear(_buffer, 0, _buffer.Length);
         _clientSocket.Shutdown(SocketShutdown.Both);
-        _clientSocket.Disconnect(true);
+        _clientSocket.Disconnect(false);
+        _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     }
 
     public static NetworkManager Instance
@@ -94,4 +91,6 @@ public sealed class NetworkManager : MonoBehaviour
             return instance;
         }
     }
+
+
 }
