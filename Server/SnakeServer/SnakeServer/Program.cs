@@ -13,11 +13,12 @@ namespace SnakeServer
         private static byte[] _buffer = new byte[1024];
 
         private static Dictionary<int, Client> _connectedClients = new Dictionary<int, Client>();
-        public static Dictionary<string, bool> _usedNames = new Dictionary<string, bool>();
+        public static Dictionary<string, int> _usedNames = new Dictionary<string, int>();
         private static Socket _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
         private static ServerHelper serverHelper = new ServerHelper();
         private static PacketHelper packetHelper = new PacketHelper();
+        private static RoomHelper roomHelper = new RoomHelper();
 
         static void Main(string[] args)
         {
@@ -185,6 +186,8 @@ namespace SnakeServer
             else
             {
                 Console.WriteLine("User ID: " + socket.GetHashCode() + " gracefully disconnected!");
+                _connectedClients[socket.GetHashCode()]._socket.Shutdown(SocketShutdown.Both);
+                _connectedClients[socket.GetHashCode()]._socket.Disconnect(true);
             }
 
             if (_connectedClients.ContainsKey(socket.GetHashCode()))

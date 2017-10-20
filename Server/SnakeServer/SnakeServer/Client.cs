@@ -30,7 +30,7 @@ namespace SnakeServer
 
             _isAllowed = true;
             _userName = name;
-            Program._usedNames.Add(name, true);
+            Program._usedNames.Add(name, _clientId);
 
             return Constants.USERNAME_OK;
         }

@@ -11,12 +11,13 @@ namespace SnakeServer
             return (BitConverter.ToUInt16(msg, 0), BitConverter.ToUInt16(len, 0));
         }
 
-        public static bool CheckIfUserNameInUse(ref string name, ref Dictionary<string, bool> dict)
+        public static bool CheckIfUserNameInUse(ref string name, ref Dictionary<string, int> dict)
         {
             if(dict.ContainsKey(name))
                 return true;
             return false;
         }
+
 
         public string PrintBytes(ref byte[] byteArray)
         {
