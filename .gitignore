@@ -13,7 +13,6 @@ ExportedObj/
 .consulo/
 *.csproj
 *.unityproj
-*.sln
 *.suo
 *.tmp
 *.user
@@ -33,13 +32,9 @@ sysinfo.txt
 *.apk
 *.unitypackage
 *.ide
-*.ide
 *.meta
 *.info
-*.exe
 *.cache
 *.bin
 *.log
-*.ide
 *.exe
-*.ide
