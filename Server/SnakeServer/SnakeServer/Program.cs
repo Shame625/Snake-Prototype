@@ -10,7 +10,7 @@ namespace SnakeServer
     {
         public static int counter = 0;
 
-        private static byte[] _buffer = new byte[1024];
+        private static byte[] _buffer = new byte[4096];
 
         private static Dictionary<int, Client> _connectedClients = new Dictionary<int, Client>();
         public static Dictionary<string, int> _usedNames = new Dictionary<string, int>();
@@ -54,21 +54,21 @@ namespace SnakeServer
         {
             try
             {
-                
+
                 Socket socket = (Socket)AR.AsyncState;
 
                 int recieved = socket.EndReceive(AR);
 
                 if (recieved == 0)
                 {
-                    RemoveClient(ref socket, true);
+                    RemoveClient(ref socket, Constants.LOGOUT_FORCED);
 
                     return;
                 }
-                else if(recieved > 1024)
+                else if (recieved > 1024)
                 {
-                    socket.Shutdown(SocketShutdown.Both);
-                    socket.Disconnect(false);
+                    DisconnectUser(ref socket);
+                    return;
                 }
 
                 counter++;
@@ -103,8 +103,8 @@ namespace SnakeServer
                 UInt16 lengthToSend = 0;
                 byte[] dataToSendTemp = new byte[512];
 
-                #region MESSAGE HANDLING
-                switch(message_number)
+#region MESSAGE HANDLING
+                switch (message_number)
                 {
                     case Messages.SET_NAME_REQUEST:
                         {
@@ -121,14 +121,42 @@ namespace SnakeServer
 
                     case Messages.LOGOUT:
                         {
-                            RemoveClient(ref socket, false);
+                            RemoveClient(ref socket, Constants.LOGOUT_NORMAL);
                             break;
                         }
+
+#region ROOM_MESSAGES
+                    case Messages.ROOM_CREATE_REQUEST:
+                        {
+                            if (data.Length <= Constants.MESSAGE_BASE + Constants.ROOM_NAME_LENGTH_MAX + Constants.ROOM_PASSWORD_LENGTH_MAX + 1)
+                            {
+                                (UInt16 errorCode, RoomStruct room) = packetHelper.BytesToRoomStruct(ref data);
+
+                                if(errorCode == Constants.ROOM_CREATE_FAILURE)
+                                {
+                                    Console.WriteLine("Room creation failed!");
+                                }
+
+                                //Proceed
+                                if(errorCode == Constants.ROOM_CREATE_SUCCESS)
+                                {
+
+                                }
+
+                                Console.WriteLine(room.roomType + " " + room.roomName + " " + room.roomPassword);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid packet for room creation!");
+                            }
+                            break;
+                        }
+#endregion
                     default:
 
                         break;
                 }
-                #endregion
+#endregion
 
 
                 byte[] dataToSend = new byte[lengthToSend];
@@ -153,6 +181,24 @@ namespace SnakeServer
             }
         }
 
+        public static void DisconnectUser(ref Socket socket)
+        {
+            byte[] dataToSend = packetHelper.UInt16ToBytesNoLen(Messages.USER_DISCONNECT, Constants.FORCED_DISCONNECT);
+            try
+            {
+                socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            RemoveClient(ref socket, Constants.LOGOUT_WARNING);
+        }
+
         private static void SendCallback(IAsyncResult AR)
         {
             try
@@ -170,29 +216,32 @@ namespace SnakeServer
             }
         }
 
-        private static void RemoveClient(ref Socket socket, bool forced)
+        private static void RemoveClient(ref Socket socket, UInt16 logout_type)
         {
             Console.WriteLine("Date / Time: " + DateTime.Now);
 
-            if (forced)
+            if (_connectedClients.ContainsKey(socket.GetHashCode()))
+            {
+                _connectedClients[socket.GetHashCode()]._socket.Shutdown(SocketShutdown.Both);
+                _connectedClients[socket.GetHashCode()]._socket.Close();
+            }
+
+            if (logout_type == Constants.LOGOUT_FORCED)
             {
                 Console.WriteLine("User ID: " + socket.GetHashCode() + " forcibly disconnected!");
-                if (_connectedClients.ContainsKey(socket.GetHashCode()))
-                {
-                    _connectedClients[socket.GetHashCode()]._socket.Shutdown(SocketShutdown.Both);
-                    _connectedClients[socket.GetHashCode()]._socket.Disconnect(true);
-                }
             }
-            else
+            else if(logout_type == Constants.LOGOUT_NORMAL)
             {
                 Console.WriteLine("User ID: " + socket.GetHashCode() + " gracefully disconnected!");
-                _connectedClients[socket.GetHashCode()]._socket.Shutdown(SocketShutdown.Both);
-                _connectedClients[socket.GetHashCode()]._socket.Disconnect(true);
+            }
+            else if(logout_type == Constants.LOGOUT_WARNING)
+            {
+                Console.WriteLine("User ID: " + socket.GetHashCode() + " attempted to overflow buffer! Closing socket.");
             }
 
             if (_connectedClients.ContainsKey(socket.GetHashCode()))
             {
-                if (_connectedClients[socket.GetHashCode()]._userName != null)
+                if (!string.IsNullOrEmpty(_connectedClients[socket.GetHashCode()]._userName))
                 {
                     if (_usedNames.ContainsKey(_connectedClients[socket.GetHashCode()]._userName))
                         _usedNames.Remove(_connectedClients[socket.GetHashCode()]._userName);

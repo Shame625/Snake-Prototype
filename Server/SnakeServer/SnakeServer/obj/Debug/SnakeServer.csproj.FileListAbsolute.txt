@@ -5,3 +5,10 @@ C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.csp
 C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.csproj.CoreCompileInputs.cache
 C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.exe
 C:\repo\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.pdb
+F:\repo\Async Server and Client\Snake-Prototype\Server\SnakeServer\SnakeServer\bin\Debug\SnakeServer.exe.config
+F:\repo\Async Server and Client\Snake-Prototype\Server\SnakeServer\SnakeServer\bin\Debug\SnakeServer.exe
+F:\repo\Async Server and Client\Snake-Prototype\Server\SnakeServer\SnakeServer\bin\Debug\SnakeServer.pdb
+F:\repo\Async Server and Client\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.csprojResolveAssemblyReference.cache
+F:\repo\Async Server and Client\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.csproj.CoreCompileInputs.cache
+F:\repo\Async Server and Client\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.exe
+F:\repo\Async Server and Client\Snake-Prototype\Server\SnakeServer\SnakeServer\obj\Debug\SnakeServer.pdb

@@ -5,10 +5,18 @@ namespace SnakeServer
     public static class Constants
     {
         //Server constants
+        public static UInt16 MESSAGE_BASE { get { return 4; } }
         public static UInt16 LOGOUT_CODE { get { return 0x0001; } }
+        public static UInt16 FORCED_DISCONNECT { get { return 0x0002; } }
+
+        //Disconect numbers
+        public static UInt16 LOGOUT_NORMAL { get { return 0x0000; } }
+        public static UInt16 LOGOUT_FORCED { get { return 0x0001; } }
+        public static UInt16 LOGOUT_WARNING { get { return 0x0002; } }
 
         //Server errors
         public static UInt16 USER_LOGGED_IN { get { return 0x00FF; } }
+        public static UInt16 USER_ALREADY_IN_ROOM { get { return 0x01FF; } }
 
         //User name constants
         public static UInt16 USERNAME_LENGTH_MIN { get { return 3; } }
@@ -24,8 +32,9 @@ namespace SnakeServer
         public static UInt16 ROOM_NAME_LENGTH_MAX { get { return 16; } }
         public static UInt16 ROOM_PASSWORD_LENGTH_MIN { get { return 3; } }
         public static UInt16 ROOM_PASSWORD_LENGTH_MAX { get { return 16; } }
-        public static UInt16 ROOM_TYPE_PRIVATE { get { return 0x0000; } }
-        public static UInt16 ROOM_TYPE_PUBLIC { get { return 0x0001; } }
+        
+        public static UInt16 ROOM_TYPE_PUBLIC { get { return 0x0000; } }
+        public static UInt16 ROOM_TYPE_PRIVATE { get { return 0x0001; } }
 
         //Room error codes
         public static UInt16 ROOM_NAME_BAD { get { return 0x0000; } }

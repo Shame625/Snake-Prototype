@@ -34,7 +34,7 @@ public class NetworkManager : MonoBehaviour
     public void LoopConnect()
     {
         _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        var endPoint = new IPEndPoint(IPAddress.Loopback, 100);
+        IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 100);
         _clientSocket.BeginConnect(endPoint, ConnectCallback, null);
     }
 
@@ -86,7 +86,9 @@ public class NetworkManager : MonoBehaviour
 
             //case of bad message
             UInt16 message_number = UInt16.MaxValue, packet_length = UInt16.MaxValue;
-            
+
+            Debug.Log(networkHelper.PrintBytes(ref dataBuff));
+
             if (recieved >= 4)
             {
                 Array.Copy(dataBuff, message_number_bytes, 2);
@@ -98,9 +100,7 @@ public class NetworkManager : MonoBehaviour
                 Debug.Log(message_number + "  " + packet_length);
             }
             
-            //Packet handling recieving/sending
-            UInt16 message_number_send = UInt16.MaxValue;
-            UInt16 lengthToSend = 0;
+            //Packet handling recieving
             byte[] dataToSendTemp = new byte[512];
 
             #region MESSAGE HANDLING
@@ -129,6 +129,38 @@ public class NetworkManager : MonoBehaviour
                         }
                         break;
                     }
+                case Messages.USER_DISCONNECT:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+ 
+                        //Decoding
+                        {
+                            if(server_response == Constants.LOGOUT_NORMAL)
+                            {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.loggedOut(Constants.LOGOUT_NORMAL);
+                                });
+                            }
+                            else if(server_response == Constants.LOGOUT_WARNING)
+                            {
+                                
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.loggedOut(Constants.LOGOUT_WARNING);
+                                });
+                            }
+                            else
+                            {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.loggedOut(Constants.LOGOUT_FORCED);
+                                });
+                            }
+                        }
+                        break;
+                    }
+
                 default:
 
                     break;
@@ -144,6 +176,7 @@ public class NetworkManager : MonoBehaviour
         }
         catch (ObjectDisposedException ex)
         {
+            ConnectionLost();
             Debug.Log(ex.Message);
         }
     }

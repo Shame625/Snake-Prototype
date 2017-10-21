@@ -11,6 +11,9 @@ public class UIManager : MonoBehaviour
     public GameObject connectionPanel;
     public GameObject mainPanel;
     public GameObject submitNamePanel;
+    public GameObject vsPlayerPanel;
+    public GameObject createRoomPanel;
+    public GameObject findRoomPanel;
 
     public InputField nameInputField;
     public Button connectButton;
@@ -18,10 +21,18 @@ public class UIManager : MonoBehaviour
     public Text userNameTextStatus;
     public Text userNameText;
 
+    //Room create
+    public Dropdown roomTypeDropdown;
+    public InputField roomName;
+    public InputField roomPassword;
+    public Text roomStatus;
+
     private void Awake()
     {
         networkManager = GetComponent<NetworkManager>();
         gameManager = GetComponent<GameManager>();
+
+        SetUpDropDownTypes();
     }
 
     public void ConnectUI()
@@ -31,6 +42,7 @@ public class UIManager : MonoBehaviour
 
     public void CheckConnectionUI()
     {
+        statusTextConnection.color = Color.white;
         if (networkManager.attempts == Constants.LOOP_MAX)
         {
             statusTextConnection.text = Constants.CONNECTION_FAILED;
@@ -57,6 +69,8 @@ public class UIManager : MonoBehaviour
         connectionPanel.SetActive(true);
         mainPanel.SetActive(false);
         submitNamePanel.SetActive(false);
+        vsPlayerPanel.SetActive(false);
+        createRoomPanel.SetActive(false);
     }
 
     public void DisplaySubmitUserNamePanelUI()
@@ -64,6 +78,8 @@ public class UIManager : MonoBehaviour
         connectionPanel.SetActive(false);
         mainPanel.SetActive(false);
         submitNamePanel.SetActive(true);
+        vsPlayerPanel.SetActive(false);
+        createRoomPanel.SetActive(false);
     }
 
     public void DisplayMainMenuUI()
@@ -71,14 +87,58 @@ public class UIManager : MonoBehaviour
         connectionPanel.SetActive(false);
         mainPanel.SetActive(true);
         submitNamePanel.SetActive(false);
+        vsPlayerPanel.SetActive(false);
+        createRoomPanel.SetActive(false);
 
         userNameText.text = "Welcome " + gameManager.player._userName;
     }
 
-    public void DisconnectedFromServerUI()
+    public void DisplayVsPlayerPanelUI()
     {
+        mainPanel.SetActive(false);
+        vsPlayerPanel.SetActive(true);
+    }
+
+    public void DisplayCreateGamePanelUI()
+    {
+        vsPlayerPanel.SetActive(false);
+        createRoomPanel.SetActive(true);
+    }
+
+    public void RoomTypeChangedUI()
+    {
+        Debug.Log(roomTypeDropdown.value);
+        if(roomTypeDropdown.value == Constants.ROOM_TYPE_PRIVATE)
+        {
+            roomName.interactable = true;
+            roomPassword.interactable = true;
+        }
+        else
+        {
+            roomName.interactable = false;
+            roomPassword.interactable = false;
+        }
+    }
+
+    public void DisconnectedFromServerUI(UInt16 code)
+    {
+        connectButton.interactable = false;
+        Invoke("WaiterBeforeConnection", 5);
+
         DisplayConnectToServerPanelUI();
-        statusTextConnection.text = Constants.CONNECTION_LOST;
+
+        if (code == Constants.LOGOUT_FORCED)
+            statusTextConnection.text = Constants.CONNECTION_LOST;
+        else if (code == Constants.LOGOUT_WARNING)
+        {
+            statusTextConnection.color = Color.red;
+            statusTextConnection.text = Constants.CONNECTION_FORCED_CLOSURE;
+        }
+    }
+
+    void WaiterBeforeConnection()
+    {
+        connectButton.interactable = true;
     }
 
     public void UserNameErrorUI(ref UInt16 err)
@@ -91,9 +151,35 @@ public class UIManager : MonoBehaviour
             userNameTextStatus.text = "User Name already in use!";
     }
 
+    void SetUpDropDownTypes()
+    {
+        roomTypeDropdown.options.Clear();
+
+        roomTypeDropdown.options.Add(new Dropdown.OptionData("Public"));
+        roomTypeDropdown.options.Add(new Dropdown.OptionData("Private"));
+        
+
+        roomTypeDropdown.value = 0;
+    }
+
     public string GetNameFromInputField()
     {
         gameManager.enteredName = nameInputField.text;
         return nameInputField.text;
+    }
+
+    public UInt16 GetGameType()
+    {
+        return (UInt16)roomTypeDropdown.value;
+    }
+
+    public string GetRoomName()
+    {
+        return roomName.text;
+    }
+
+    public string GetRoomPassword()
+    {
+        return roomPassword.text;
     }
 }

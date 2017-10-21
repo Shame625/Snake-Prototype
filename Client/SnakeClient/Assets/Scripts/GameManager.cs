@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        Application.runInBackground = true;
         networkManager = GetComponent<NetworkManager>();
         networkHelper = GetComponent<NetworkHelper>();
         player = new Player();

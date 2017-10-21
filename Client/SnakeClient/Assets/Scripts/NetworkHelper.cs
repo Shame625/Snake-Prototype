@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using UnityEngine;
 
 public class NetworkHelper : MonoBehaviour
@@ -32,7 +33,7 @@ public class NetworkHelper : MonoBehaviour
     {
         if (!networkManager.GetStatusConnection())
         {
-            uiManager.DisconnectedFromServerUI();
+            uiManager.DisconnectedFromServerUI(Constants.LOGOUT_FORCED);
             CancelInvoke("ConnectionHeartbeat");
         }
     }
@@ -80,6 +81,32 @@ public class NetworkHelper : MonoBehaviour
     public void userNameBAD(UInt16 err)
     {
         uiManager.UserNameErrorUI(ref err);
+    }
+
+    public void loggedOut(UInt16 code)
+    {
+        CancelInvoke("ConnectionHeartbeat");
+        if(code == Constants.LOGOUT_NORMAL)
+            Application.Quit();
+
+        uiManager.DisconnectedFromServerUI(code);
+    }
+
+
+    public string PrintBytes(ref byte[] byteArray)
+    {
+        var sb = new StringBuilder("new byte[] { ");
+        for (var i = 0; i < byteArray.Length; i++)
+        {
+            var b = byteArray[i];
+            sb.Append(b.ToString("X"));
+            if (i < byteArray.Length - 1)
+            {
+                sb.Append(", ");
+            }
+        }
+        sb.Append(" }");
+        return sb.ToString();
     }
 
     public void BytesToMessageLength(ref byte[] msg, ref byte[] len, ref UInt16 msgNo, ref UInt16 length)

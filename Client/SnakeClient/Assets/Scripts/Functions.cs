@@ -17,17 +17,35 @@ public class Functions : MonoBehaviour
 
     public void SubmitUserName()
     {
-            string name = "";
-            name = uiManager.GetNameFromInputField();
+        string name = "";
+        name = uiManager.GetNameFromInputField();
 
-            byte[] dataToSend = packetHelper.StringToBytes(Messages.SET_NAME_REQUEST, ref name);
+        byte[] dataToSend = packetHelper.StringToBytes(Messages.SET_NAME_REQUEST, ref name);
+        networkManager.SendPacket(ref dataToSend);
+    }
+
+    public void CreateGame()
+    {
+        UInt16 gameType = uiManager.GetGameType();
+        byte[] dataToSend;
+
+        if (gameType == Constants.ROOM_TYPE_PUBLIC)
+        {
+            dataToSend = packetHelper.UInt16ToBytes(Messages.ROOM_CREATE_REQUEST, Constants.ROOM_TYPE_PUBLIC);
+        }
+        else
+        {
+            dataToSend = packetHelper.PrivateRoomToBytes(Messages.ROOM_CREATE_REQUEST, Constants.ROOM_TYPE_PRIVATE, uiManager.GetRoomName(), uiManager.GetRoomPassword());
+            
+        }
+
+        if(dataToSend.Length >= 4)
             networkManager.SendPacket(ref dataToSend);
     }
 
     public void Logout()
     {
         byte[] dataToSend = packetHelper.UInt16ToBytes(Messages.LOGOUT, Constants.LOGOUT_CODE);
-        Debug.Log(PrintBytes(ref dataToSend));
         networkManager.SendPacket(ref dataToSend);
     }
 
@@ -46,4 +64,5 @@ public class Functions : MonoBehaviour
         sb.Append(" }");
         return sb.ToString();
     }
+
 }
