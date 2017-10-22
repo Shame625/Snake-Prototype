@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     private NetworkHelper networkHelper;
 
     public Player player;
+    public Player opponent;
+
     public Room currentRoom;
 
     public string enteredName;
@@ -21,6 +23,9 @@ public class GameManager : MonoBehaviour
         networkManager = GetComponent<NetworkManager>();
         networkHelper = GetComponent<NetworkHelper>();
         player = new Player();
+        opponent = new Player();
+        currentRoom = new Room();
+        opponent._userName = "";
     }
 
     private void Start()

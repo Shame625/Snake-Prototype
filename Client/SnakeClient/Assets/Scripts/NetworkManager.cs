@@ -60,6 +60,14 @@ public class NetworkManager : MonoBehaviour
     public void SendPacket(ref byte[] data)
     {
         _clientSocket.Send(data);
+
+        byte[] debugBytes = data;
+
+        UnityThreadHelper.Dispatcher.Dispatch(() =>
+            {
+                networkHelper.SetPacketDisplay(networkHelper.PrintBytes(ref debugBytes), true);
+            });
+
         _clientSocket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), this);
     }
 
@@ -86,7 +94,13 @@ public class NetworkManager : MonoBehaviour
             //case of bad message
             UInt16 message_number = UInt16.MaxValue, packet_length = UInt16.MaxValue;
 
-            Debug.Log(networkHelper.PrintBytes(ref dataBuff));
+
+            
+
+            UnityThreadHelper.Dispatcher.Dispatch(() =>
+            {
+                networkHelper.SetPacketDisplay(networkHelper.PrintBytes(ref dataBuff), false);
+            });
 
             if (recieved >= 4)
             {
@@ -207,6 +221,93 @@ public class NetworkManager : MonoBehaviour
                         break;
                     }
 
+                case Messages.ROOM_JOIN_PUBLIC_ROOM_RESPONSE:
+                {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+
+                        //Decoding
+                        {
+                            if(server_response == Constants.ROOM_JOIN_SUCCESS)
+                            {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.roomJoinSuccess();
+                                });
+                            }
+                            else
+                            {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.roomJoinFailed();
+                                });
+                            }
+                        }
+
+                        break;
+                }
+
+                case Messages.ROOM_CANCEL_FINDING_RESPONSE:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+
+                        //Decoding
+                        {
+                            if (server_response == Constants.ROOM_CANCEL_FINDING_SUCCESS)
+                            {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.roomCancelFindingSuccess();
+                                });
+                            }
+                            else
+                            {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.roomCancelFindingFailed();
+                                });
+                            }
+                        }
+
+                        break;
+                    }
+
+                case Messages.ROOM_JOINED_MY_ROOM:
+                    {
+                        string opponent = Encoding.ASCII.GetString(data);
+
+                        if(!string.IsNullOrEmpty(opponent))
+                        {
+                            UnityThreadHelper.Dispatcher.Dispatch(() =>
+                            {
+                                networkHelper.playerJoinedMyRoom(opponent);
+                            });
+                        }
+                        break;
+                    }
+
+                case Messages.ROOM_JOINED_PUBLIC_ROOM:
+                    {
+                        int room_id;
+                        string opponentUserName = "";
+                        room_id = packetHelper.BytesToJoinedRoomData(ref data, ref opponentUserName);
+
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.joinedRoom(room_id, opponentUserName);
+                        });
+
+                        break;
+                    }
+
+                case Messages.ROOM_CLOSED:
+                    {
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.roomClosed();
+                        });
+
+                        break;
+                    }
                 default:
 
                     break;

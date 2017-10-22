@@ -8,13 +8,21 @@ public class UIManager : MonoBehaviour
     private NetworkManager networkManager;
     private GameManager gameManager;
 
+    //Debug crap
+    public Text debugPacketRecieved;
+    public Text debugPacketSent;
+    public GameObject packetHistory;
+    public GameObject packetHistoryItemPrefab;
+    public Scrollbar packetHistoryScrollbar;
+
     public GameObject connectionPanel;
     public GameObject mainPanel;
     public GameObject submitNamePanel;
     public GameObject vsPlayerPanel;
     public GameObject createRoomPanel;
-    public GameObject findRoomPanel;
     public GameObject inRoomPanel;
+    public GameObject findGamePanel;
+    public GameObject findingPublicGamePanel;
 
     public InputField nameInputField;
     public Button connectButton;
@@ -84,6 +92,8 @@ public class UIManager : MonoBehaviour
         vsPlayerPanel.SetActive(false);
         createRoomPanel.SetActive(false);
         inRoomPanel.SetActive(false);
+        findGamePanel.SetActive(false);
+        findingPublicGamePanel.SetActive(false);
     }
 
     public void DisplaySubmitUserNamePanelUI()
@@ -96,6 +106,7 @@ public class UIManager : MonoBehaviour
         vsPlayerPanel.SetActive(false);
         createRoomPanel.SetActive(false);
         inRoomPanel.SetActive(false);
+        findGamePanel.SetActive(false);
     }
 
     public void DisplayMainMenuUI()
@@ -106,6 +117,7 @@ public class UIManager : MonoBehaviour
         vsPlayerPanel.SetActive(false);
         createRoomPanel.SetActive(false);
         inRoomPanel.SetActive(false);
+        findGamePanel.SetActive(false);
 
         userNameText.text = "Welcome " + gameManager.player._userName;
     }
@@ -116,6 +128,7 @@ public class UIManager : MonoBehaviour
         vsPlayerPanel.SetActive(true);
         createRoomPanel.SetActive(false);
         inRoomPanel.SetActive(false);
+        findGamePanel.SetActive(false);
     }
 
     public void DisplayCreateGamePanelUI()
@@ -124,6 +137,14 @@ public class UIManager : MonoBehaviour
 
         vsPlayerPanel.SetActive(false);
         createRoomPanel.SetActive(true);
+        inRoomPanel.SetActive(false);
+    }
+
+    public void DisplayFindGamePanelUI()
+    {
+        findGamePanel.SetActive(true);
+        vsPlayerPanel.SetActive(false);
+        findingPublicGamePanel.SetActive(false);
         inRoomPanel.SetActive(false);
     }
 
@@ -142,8 +163,15 @@ public class UIManager : MonoBehaviour
 
     public void DisplayRoomPanelUI()
     {
+        player1.text = gameManager.player._userName;
+        player2.text = gameManager.opponent._userName;
+
+
+
         createRoomPanel.SetActive(false);
         inRoomPanel.SetActive(true);
+        findGamePanel.SetActive(false);
+        findingPublicGamePanel.SetActive(false);
     }
 
     public void RoomTypeChangedUI()
@@ -182,6 +210,17 @@ public class UIManager : MonoBehaviour
     void WaiterBeforeConnection()
     {
         connectButton.interactable = true;
+    }
+
+    public void PlayerJoinedMyRoomUI()
+    {
+        player2.text = gameManager.opponent._userName;
+    }
+
+    public void JoinedRoomUI()
+    {
+        player2.text = gameManager.opponent._userName;
+        DisplayRoomPanelUI();
     }
 
     public void UserNameErrorUI(ref UInt16 err)
@@ -264,6 +303,16 @@ public class UIManager : MonoBehaviour
         return roomPassword.text;
     }
 
+    public void ShowFindingPublicGamePanelUI()
+    {
+        findingPublicGamePanel.SetActive(true);
+    }
+
+    public void HideFindingPublicGamePanelUI()
+    {
+        findingPublicGamePanel.SetActive(false);
+    }
+
     public void ShowErrorPanel(string txt)
     {
         errorPanelMessage.text = txt;
@@ -273,5 +322,23 @@ public class UIManager : MonoBehaviour
     public void HideErrorPanel()
     {
         errorPanel.SetActive(false);
+    }
+
+    public void LastPacketRecievedUI(string s)
+    {
+        debugPacketRecieved.text = s;
+    }
+
+    public void LastPacketSentUI(string s)
+    {
+        debugPacketSent.text = s;
+    }
+
+    public void AddPacketToHistory(bool t, string s)
+    {
+        GameObject temp = Instantiate(packetHistoryItemPrefab, packetHistory.transform, false);
+        temp.GetComponent<PacketUI>().SetPrefab(t, s);
+
+        packetHistoryScrollbar.value = 0.0f ;
     }
 }

@@ -6,6 +6,7 @@ class Constants
     public static UInt16 USERNAME_BAD { get { return 0x0000; } }
     public static UInt16 USERNAME_OK { get { return 0x0001; } }
     public static UInt16 USERNAME_IN_USE { get { return 0x0002; } }
+    public static UInt16 BAD_PACKET_SIZE { get { return 0x0003; } }
 
     //Client constants
     public static UInt16 LOGOUT_CODE { get { return 0x0001; } }
@@ -50,10 +51,20 @@ class Constants
     public static UInt16 ROOM_TYPE_OK { get { return 0x0005; } }
     public static UInt16 ROOM_NAME_IN_USE { get { return 0x0006; } }
 
-    public static UInt16 ROOM_ABANDONED_SUCCESS { get { return 0x0006; } }
-    public static UInt16 ROOM_ABANDONED_FAILURE { get { return 0x0007; } }
-    public static UInt16 ROOM_LEAVE_SUCCESS { get { return 0x0008; } }
-    public static UInt16 ROOM_LEAVE_FAILURE { get { return 0x0009; } }
+    public static UInt16 ROOM_ABANDONED_SUCCESS { get { return 0x0000; } }
+    public static UInt16 ROOM_ABANDONED_FAILURE { get { return 0x0001; } }
+
+    public static UInt16 ROOM_LEAVE_SUCCESS { get { return 0x0002; } }
+    public static UInt16 ROOM_LEAVE_FAILURE { get { return 0x0003; } }
+
+    public static UInt16 ROOM_JOIN_SUCCESS { get { return 0x0004; } }
+    public static UInt16 ROOM_JOIN_FAILURE { get { return 0x0005; } }
+
+    public static UInt16 ROOM_CANCEL_FINDING_SUCCESS { get { return 0x0006; } }
+    public static UInt16 ROOM_CANCEL_FINDING_FAILURE { get { return 0x0007; } }
+
+    public static UInt16 ROOM_USER_JOINED { get { return 0x0008; } }
+    public static UInt16 ROOM_USER_LEFT { get { return 0x0009; } }
 
     public static UInt16 ROOM_CREATE_FAILURE { get { return 0x00FE; } }
     public static UInt16 ROOM_CREATE_SUCCESS { get { return 0x00FF; } }
@@ -65,7 +76,10 @@ class Constants
     public static string ROOM_ALREADY_IN { get { return "You are already in a room!"; } }
     public static string ROOM_NAME_IN_USE_MSG { get { return "Room with the same name already exists!"; } }
     public static string ROOM_ABANDONED_SUCCESS_MSG { get { return "You have abandoned the room!"; } }
+    public static string ROOM_ABANDONED_MSG { get { return "Host has abandoned the room!"; } }
     public static string ROOM_ABANDONED_FAILED_MSG { get { return "You have failed to abandoned the room!"; } }
     public static string ROOM_LEAVE_SUCCESS_MSG { get { return "You have left the room!"; } }
     public static string ROOM_LEAVE_FAILED_MSG { get { return "You have failed to leave the room!"; } }
+    public static string ROOM_JOIN_FAILURE_MSG { get { return "Failed to look for a room, are you in a room already?"; } }
+    public static string ROOM_CANCEL_FINDING_FAILURE_MSG { get { return "Failed to cancel finding a room!"; } }
 }

@@ -112,6 +112,53 @@ public class NetworkHelper : MonoBehaviour
         uiManager.RoomCreatedUI();
     }
 
+    public void playerJoinedMyRoom(string n)
+    {
+        gameManager.opponent._userName = n;
+        uiManager.PlayerJoinedMyRoomUI();
+    }
+
+    public void joinedRoom(int id, string name)
+    {
+        gameManager.opponent._userName = name;
+        gameManager.currentRoom.isAdmin = false;
+        uiManager.JoinedRoomUI();
+    }
+
+    public void roomClosed()
+    {
+        gameManager.opponent._userName = "";
+        gameManager.currentRoom.roomId = 0;
+        gameManager.player._inRoom = false;
+        gameManager.player._findingRoom = false;
+
+        uiManager.ShowErrorPanel(Constants.ROOM_ABANDONED_MSG);
+        uiManager.DisplayFindGamePanelUI();
+    }
+
+    public void roomJoinSuccess()
+    {
+        gameManager.player._findingRoom = true;
+        uiManager.ShowFindingPublicGamePanelUI();
+    }
+
+    public void roomJoinFailed()
+    {
+        uiManager.ShowErrorPanel(Constants.ROOM_JOIN_FAILURE_MSG);
+    }
+
+    public void roomCancelFindingSuccess()
+    {
+        gameManager.player._findingRoom = false;
+        uiManager.DisplayFindGamePanelUI();
+    }
+
+    public void roomCancelFindingFailed()
+    {
+        uiManager.ShowErrorPanel(Constants.ROOM_CANCEL_FINDING_FAILURE_MSG);
+        uiManager.DisplayFindGamePanelUI();
+    }
+
     public void roomCreationFailed(ref UInt16 errorCode)
     {
         uiManager.RoomCreationFailedUI(errorCode);
@@ -121,14 +168,15 @@ public class NetworkHelper : MonoBehaviour
     {
         if(errorCode == Constants.ROOM_ABANDONED_SUCCESS)
         {
-            gameManager.currentRoom = null;
+            gameManager.currentRoom.roomId = 0;
+            gameManager.player._inRoom = false;
         }
         uiManager.AbandonRoomUI(errorCode);
     }
 
     public string PrintBytes(ref byte[] byteArray)
     {
-        var sb = new StringBuilder("new byte[] { ");
+        var sb = new StringBuilder("{ ");
         for (var i = 0; i < byteArray.Length; i++)
         {
             var b = byteArray[i];
@@ -140,6 +188,17 @@ public class NetworkHelper : MonoBehaviour
         }
         sb.Append(" }");
         return sb.ToString();
+    }
+
+    public void SetPacketDisplay(string s, bool t)
+    {
+        uiManager.AddPacketToHistory(t, s);
+
+        if (t)
+        {
+            uiManager.LastPacketSentUI(s);
+        }
+        uiManager.LastPacketRecievedUI(s);
     }
 
     public void BytesToMessageLength(ref byte[] msg, ref byte[] len, ref UInt16 msgNo, ref UInt16 length)

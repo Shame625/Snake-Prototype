@@ -5,9 +5,11 @@ namespace SnakeServer
     public static class Constants
     {
         //Server constants
+        public static int QUEUE_TIMER_TICK_MILISECONDS { get { return 500; } }
         public static UInt16 MESSAGE_BASE { get { return 4; } }
         public static UInt16 LOGOUT_CODE { get { return 0x0001; } }
         public static UInt16 FORCED_DISCONNECT { get { return 0x0002; } }
+        public static UInt16 BAD_PACKET_SIZE { get { return 0x0003; } }
 
         //Disconect numbers
         public static UInt16 LOGOUT_NORMAL { get { return 0x0000; } }
@@ -48,11 +50,15 @@ namespace SnakeServer
         public static UInt16 ROOM_CREATE_FAILURE { get { return 0x00FE; } }
         public static UInt16 ROOM_CREATE_SUCCESS { get { return 0x00FF; } }
 
-
-        public static UInt16 ROOM_ABANDONED_SUCCESS { get { return 0x0006; } }
-        public static UInt16 ROOM_ABANDONED_FAILURE { get { return 0x0007; } }
-        public static UInt16 ROOM_LEAVE_SUCCESS { get { return 0x0008; } }
-        public static UInt16 ROOM_LEAVE_FAILURE { get { return 0x0009; } }
+        //Room abandon / leave cosnstants
+        public static UInt16 ROOM_ABANDONED_SUCCESS { get { return 0x0000; } }
+        public static UInt16 ROOM_ABANDONED_FAILURE { get { return 0x0001; } }
+        public static UInt16 ROOM_LEAVE_SUCCESS { get { return 0x0002; } }
+        public static UInt16 ROOM_LEAVE_FAILURE { get { return 0x0003; } }
+        public static UInt16 ROOM_JOIN_SUCCESS { get { return 0x0004; } }
+        public static UInt16 ROOM_JOIN_FAILURE { get { return 0x0005; } }
+        public static UInt16 ROOM_CANCEL_FINDING_SUCCESS { get { return 0x0006; } }
+        public static UInt16 ROOM_CANCEL_FINDING_FAILURE { get { return 0x0007; } }
 
     }
 }

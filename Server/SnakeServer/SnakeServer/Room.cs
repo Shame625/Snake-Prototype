@@ -11,19 +11,22 @@ namespace SnakeServer
     {
         public UInt16 _type { get; }
 
-        private int _roomId;
+        public int _roomId { get; }
         public string _roomName { get; }
         string _roomPassword;
 
-        Client[] refClients = new Client[2];
+        public Client[] refClients = new Client[2];
 
         public Client _roomAdmin { get; set; }
+
+        public bool _isEmpty { get; set; }
 
         public Room(Client c, UInt16 t, int id, string name, string password)
         {
             _type = t;
             _roomId = id;
             _roomAdmin = c;
+            _isEmpty = true;
 
             if (_type == Constants.ROOM_TYPE_PRIVATE)
             {
@@ -37,24 +40,25 @@ namespace SnakeServer
             _type = t;
             _roomId = id;
             _roomAdmin = c;
+            _isEmpty = true;
         }
 
         public void AddPlayer(ref Client c)
         {
             if(c._isAllowed)
             {
-                if(!c._isInRoom)
-                {
-                    if(refClients[0] == null)
-                    {
-                        refClients[0] = c;
-                    }
-                    else if(refClients[1] == null)
-                    {
-                        refClients[1] = c;
-                    }
-                }
+                refClients[1] = c;
             }
+            _isEmpty = false;
+        }
+
+        public void RemovePlayer2()
+        {
+            if(refClients[1] != null)
+            {
+                refClients[1] = null;
+            }
+            _isEmpty = true;
         }
 
         public void SetAdmin(Client c)

@@ -7,6 +7,11 @@ public class Room
     public bool isAdmin { get; set; }
     public UInt16 roomType { get; set; }
 
+    public Room()
+    {
+
+    }
+
     public Room(bool admin)
     {
         isAdmin = true;

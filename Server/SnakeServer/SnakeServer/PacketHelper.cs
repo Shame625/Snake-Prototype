@@ -15,8 +15,6 @@ namespace SnakeServer
 
     class PacketHelper
     {
-
-
         public (UInt16, byte[]) UInt16ToBytes(UInt16 msg, UInt16 resp)
         {
             byte[] data = new byte[6];
@@ -31,21 +29,47 @@ namespace SnakeServer
             return (6, data);
         }
 
+        public byte[] StringToBytes(UInt16 messageNo, string str)
+        {
+            byte[] data = Encoding.ASCII.GetBytes(str);
+
+            UInt16 length = CalculateLength(ref data);
+            byte[] dataToSend = new byte[length];
+
+            FillHeader(ref messageNo, length, ref dataToSend);
+
+            Array.Copy(data, 0, dataToSend, 4, data.Length);
+
+            return dataToSend;
+        }
+
         public (UInt16, RoomStruct) BytesToRoomStruct(ref byte[] data)
         {
             RoomStruct room = new RoomStruct();
             UInt16 errorCode = Constants.ROOM_CREATE_SUCCESS;
+             
+            if (data.Length + Constants.MESSAGE_BASE < PacketSizes.ROOM_CREATE_MIN)
+                return (Constants.ROOM_CREATE_FAILURE, room);
 
-            if (data.Length > 36)
+
+            if (data.Length + Constants.MESSAGE_BASE > (PacketSizes.ROOM_CREATE_MAX))
                 return (Constants.ROOM_PASSWORD_BAD, room);
 
             byte[] roomTypeBytes = new byte[2];
             byte[] roomNameBytes = new byte[15];
             byte[] roomPasswordBytes = new byte[15];
 
-            Array.Copy(data, roomTypeBytes, 2);
+            try
+            {
+                Array.Copy(data, roomTypeBytes, 2);
+            }
+            catch
+            {
+                return (Constants.ROOM_CREATE_FAILURE, room);
+            }
 
             room.roomType = BitConverter.ToUInt16(roomTypeBytes, 0);
+            
 
             if (room.roomType == Constants.ROOM_TYPE_PRIVATE)
             {
@@ -108,6 +132,22 @@ namespace SnakeServer
             return (length, data);
         }
 
+        public byte[] JoinedRoomDataToBytes(UInt16 msg, int id, string userName)
+        {
+            byte[] data = new byte[8 + userName.Length];
+            byte[] id_bytes = new byte[4];
+
+            byte[] string_bytes = Encoding.ASCII.GetBytes(userName);
+            id_bytes = BitConverter.GetBytes(id);
+            UInt16 length = Convert.ToUInt16(Constants.MESSAGE_BASE + id_bytes.Length + string_bytes.Length);
+            FillHeader(ref msg, length, ref data);
+
+            Array.Copy(id_bytes, 0, data, 4, id_bytes.Length);
+            Array.Copy(string_bytes, 0, data, 8, string_bytes.Length);
+
+            return data;
+        }
+
         void FillHeader(ref UInt16 messageNo, UInt16 len, ref byte[] data)
         {
             byte[] message_bytes = new byte[2];
@@ -121,6 +161,23 @@ namespace SnakeServer
 
             data[2] = length_bytes[0];
             data[3] = length_bytes[1];
+        }
+
+        public UInt16 FillHeaderBlankData(UInt16 messageNo, ref byte[] data)
+        {
+            byte[] message_bytes = new byte[2];
+            byte[] length_bytes = new byte[2];
+
+            message_bytes = BitConverter.GetBytes(messageNo);
+            length_bytes = BitConverter.GetBytes((UInt16)4);
+
+            data[0] = message_bytes[0];
+            data[1] = message_bytes[1];
+
+            data[2] = length_bytes[0];
+            data[3] = length_bytes[1];
+
+            return 4;
         }
 
         UInt16 CalculateLength(ref byte[] data)

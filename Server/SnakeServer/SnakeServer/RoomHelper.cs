@@ -107,6 +107,39 @@ namespace SnakeServer
             {
                 Program._privateRooms.Remove(r._roomName);
             }
+            else
+            {
+                Program._publicRooms.Remove(r._roomId);
+            }
+        }
+
+        public void PublicGamesTick(Room r)
+        {
+            if (Program._clientQueue.Count != 0)
+            {
+                try
+                {
+                    if (Program._connectedClients[Program._clientQueue[0]]._findingRoom)
+                    {
+                        Console.WriteLine("Clinet ID:" + Program._connectedClients[Program._clientQueue[0]]._clientId + " joined the room ID: " + r._roomId);
+
+                        Program.SendDataJoinedRoom(r, Program._connectedClients[Program._clientQueue[0]]);
+
+                        Program._clientQueue.RemoveAt(0);
+
+                        Console.WriteLine("People in queue: " + Program._clientQueue.Count);
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("remove DICT KEYS!");
+                }
+            }
+        }
+
+        public void JoinPublicGame(Room r, Client c)
+        {
+
         }
 
         private static bool CheckIfRoomNameInUse(ref string name, ref Dictionary<string, Room> dict)

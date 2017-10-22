@@ -59,6 +59,20 @@ public class PacketHelper : MonoBehaviour
         return data;
     }
 
+    public int BytesToJoinedRoomData(ref byte[] data, ref string opponentName)
+    {
+        int nameLen = data.Length - 4;
+        byte[] id_bytes = new byte[4];
+        byte[] name_bytes = new byte[nameLen];
+
+        Array.Copy(data, 0, id_bytes, 0, 4);
+        Array.Copy(data, 4, name_bytes, 0, nameLen);
+
+        opponentName = Encoding.ASCII.GetString(name_bytes);
+
+        return BitConverter.ToInt32(id_bytes, 0);
+    }
+
     public byte[] PrivateRoomToBytes(UInt16 msg, UInt16 roomType, string roomName, string roomPassword)
     {
         UInt16 pass_len = 0;
@@ -133,7 +147,22 @@ public class PacketHelper : MonoBehaviour
         data[3] = length_bytes[1];
     }
 
-    void FillHeaderBlankData(ref UInt16 messageNo, ref byte[] data)
+    public void FillHeaderBlankData(ref UInt16 messageNo, ref byte[] data)
+    {
+        byte[] message_bytes = new byte[2];
+        byte[] length_bytes = new byte[2];
+
+        message_bytes = BitConverter.GetBytes(messageNo);
+        length_bytes = BitConverter.GetBytes((UInt16)4);
+
+        data[0] = message_bytes[0];
+        data[1] = message_bytes[1];
+
+        data[2] = length_bytes[0];
+        data[3] = length_bytes[1];
+    }
+
+    public void FillHeaderBlankData(UInt16 messageNo, ref byte[] data)
     {
         byte[] message_bytes = new byte[2];
         byte[] length_bytes = new byte[2];
@@ -151,5 +180,23 @@ public class PacketHelper : MonoBehaviour
     UInt16 CalculateLength(ref byte[] data)
     {
         return Convert.ToUInt16(data.Length + 4);
+    }
+
+
+
+    public string PrintBytes(ref byte[] byteArray)
+    {
+        var sb = new StringBuilder("new byte[] { ");
+        for (var i = 0; i < byteArray.Length; i++)
+        {
+            var b = byteArray[i];
+            sb.Append(b.ToString("X"));
+            if (i < byteArray.Length - 1)
+            {
+                sb.Append(", ");
+            }
+        }
+        sb.Append(" }");
+        return sb.ToString();
     }
 }

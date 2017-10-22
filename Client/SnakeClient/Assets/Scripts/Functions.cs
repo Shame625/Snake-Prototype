@@ -33,6 +33,12 @@ public class Functions : MonoBehaviour
         networkManager.SendPacket(ref dataToSend);
     }
 
+    public void DebugCheatFunction()
+    {
+        byte[] dataToSend = new byte[3];
+        networkManager.SendPacket(ref dataToSend);
+    }
+
     public void CreateGame()
     {
         UInt16 gameType = uiManager.GetGameType();
@@ -60,6 +66,28 @@ public class Functions : MonoBehaviour
         }
     }
 
+    public void FindPublicGame()
+    {
+        if (!gameManager.player._inRoom)
+        {
+            byte[] dataToSend = new byte[4];
+            packetHelper.FillHeaderBlankData(Messages.ROOM_JOIN_PUBLIC_ROOM_REQUEST, ref dataToSend);
+            networkManager.SendPacket(ref dataToSend);
+        }
+    }
+
+    public void FindPrivateGame()
+    {
+
+    }
+
+    public void CancelFindingPublicGame()
+    {
+        byte[] dataToSend = new byte[4];
+        packetHelper.FillHeaderBlankData(Messages.ROOM_CANCEL_FINDING_REQUEST, ref dataToSend);
+        networkManager.SendPacket(ref dataToSend);
+    }
+
     public void Logout()
     {
         byte[] dataToSend = packetHelper.UInt16ToBytes(Messages.LOGOUT, Constants.LOGOUT_CODE);
@@ -81,5 +109,4 @@ public class Functions : MonoBehaviour
         sb.Append(" }");
         return sb.ToString();
     }
-
 }
