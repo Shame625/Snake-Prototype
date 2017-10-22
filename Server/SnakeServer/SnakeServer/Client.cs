@@ -12,11 +12,15 @@ namespace SnakeServer
         public string _userName { get; set; }
         public bool _isAllowed{ get; set; }
 
+        public bool _isInRoom { get; set; }
+        public Room _currentRoom { get; set; }
+
         public Client(int id, Socket socket)
         {
             _clientId = id;
             _socket = socket;
             _isAllowed = false;
+            _isInRoom = false;
         }
 
         public UInt16 SetName(ref string name)
@@ -34,5 +38,17 @@ namespace SnakeServer
 
             return Constants.USERNAME_OK;
         }
+
+        public void EnteredRoom(ref Room r)
+        {
+            _currentRoom = r;
+            _isInRoom = true;
+        }
+        public void LeftRoom()
+        {
+            _currentRoom = null;
+            _isInRoom = false;
+        }
+
     }
 }

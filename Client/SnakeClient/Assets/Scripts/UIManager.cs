@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
     public GameObject vsPlayerPanel;
     public GameObject createRoomPanel;
     public GameObject findRoomPanel;
+    public GameObject inRoomPanel;
 
     public InputField nameInputField;
     public Button connectButton;
@@ -25,7 +26,18 @@ public class UIManager : MonoBehaviour
     public Dropdown roomTypeDropdown;
     public InputField roomName;
     public InputField roomPassword;
-    public Text roomStatus;
+    public Text roomCreationStatus;
+
+    //In room commands
+    public Text player1;
+    public Text player2;
+    public Text roomTitle;
+    public Button AbandonButton;
+
+
+    //Error panel
+    public GameObject errorPanel;
+    public Text errorPanelMessage; 
 
     private void Awake()
     {
@@ -71,15 +83,19 @@ public class UIManager : MonoBehaviour
         submitNamePanel.SetActive(false);
         vsPlayerPanel.SetActive(false);
         createRoomPanel.SetActive(false);
+        inRoomPanel.SetActive(false);
     }
 
     public void DisplaySubmitUserNamePanelUI()
     {
+        userNameTextStatus.text = "";
+
         connectionPanel.SetActive(false);
         mainPanel.SetActive(false);
         submitNamePanel.SetActive(true);
         vsPlayerPanel.SetActive(false);
         createRoomPanel.SetActive(false);
+        inRoomPanel.SetActive(false);
     }
 
     public void DisplayMainMenuUI()
@@ -89,6 +105,7 @@ public class UIManager : MonoBehaviour
         submitNamePanel.SetActive(false);
         vsPlayerPanel.SetActive(false);
         createRoomPanel.SetActive(false);
+        inRoomPanel.SetActive(false);
 
         userNameText.text = "Welcome " + gameManager.player._userName;
     }
@@ -97,12 +114,36 @@ public class UIManager : MonoBehaviour
     {
         mainPanel.SetActive(false);
         vsPlayerPanel.SetActive(true);
+        createRoomPanel.SetActive(false);
+        inRoomPanel.SetActive(false);
     }
 
     public void DisplayCreateGamePanelUI()
     {
+        roomCreationStatus.text = "";
+
         vsPlayerPanel.SetActive(false);
         createRoomPanel.SetActive(true);
+        inRoomPanel.SetActive(false);
+    }
+
+    public void RoomCreatedUI()
+    {
+        player1.text = gameManager.player._userName;
+
+        if(gameManager.currentRoom.roomType == Constants.ROOM_TYPE_PRIVATE)
+            roomTitle.text = gameManager.enteredRoomName;
+        else
+            roomTitle.text = "Public room";
+        AbandonButton.GetComponentInChildren<Text>().text = "Abandon Room";
+
+        DisplayRoomPanelUI();
+    }
+
+    public void DisplayRoomPanelUI()
+    {
+        createRoomPanel.SetActive(false);
+        inRoomPanel.SetActive(true);
     }
 
     public void RoomTypeChangedUI()
@@ -112,11 +153,13 @@ public class UIManager : MonoBehaviour
         {
             roomName.interactable = true;
             roomPassword.interactable = true;
+            gameManager.enteredroomType = Constants.ROOM_TYPE_PRIVATE;
         }
         else
         {
             roomName.interactable = false;
             roomPassword.interactable = false;
+            gameManager.enteredroomType = Constants.ROOM_TYPE_PUBLIC;
         }
     }
 
@@ -168,6 +211,43 @@ public class UIManager : MonoBehaviour
         return nameInputField.text;
     }
 
+    public void RoomCreationFailedUI(UInt16 errorCode)
+    {
+        if(errorCode == Constants.ROOM_CREATE_FAILURE)
+        {
+            roomCreationStatus.text = Constants.ROOM_UNKNOWN_ERROR;
+        }
+        else if(errorCode == Constants.ROOM_NAME_BAD)
+        {
+            roomCreationStatus.text = Constants.ROOM_NAME_BAD_MSG;
+        }
+        else if(errorCode == Constants.ROOM_NAME_IN_USE)
+        {
+            roomCreationStatus.text = Constants.ROOM_NAME_IN_USE_MSG;
+        }
+        else if (errorCode == Constants.ROOM_PASSWORD_BAD)
+        {
+            roomCreationStatus.text = Constants.ROOM_NAME_BAD_PASSWORD_MSG;
+        }
+        else if(errorCode == Constants.USER_ALREADY_IN_ROOM)
+        {
+            roomCreationStatus.text = Constants.ROOM_ALREADY_IN;
+        }
+    }
+
+    public void AbandonRoomUI(UInt16 errorCode)
+    {
+        if(errorCode == Constants.ROOM_ABANDONED_SUCCESS)
+        {
+            ShowErrorPanel(Constants.ROOM_ABANDONED_SUCCESS_MSG);
+            DisplayVsPlayerPanelUI();
+        }
+        else
+        {
+            ShowErrorPanel(Constants.ROOM_ABANDONED_FAILED_MSG);
+        }
+    }
+
     public UInt16 GetGameType()
     {
         return (UInt16)roomTypeDropdown.value;
@@ -175,11 +255,23 @@ public class UIManager : MonoBehaviour
 
     public string GetRoomName()
     {
+        gameManager.enteredRoomName = roomName.text;
         return roomName.text;
     }
 
     public string GetRoomPassword()
     {
         return roomPassword.text;
+    }
+
+    public void ShowErrorPanel(string txt)
+    {
+        errorPanelMessage.text = txt;
+        errorPanel.SetActive(true);
+    }
+
+    public void HideErrorPanel()
+    {
+        errorPanel.SetActive(false);
     }
 }

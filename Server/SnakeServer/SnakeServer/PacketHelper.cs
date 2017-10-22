@@ -37,7 +37,7 @@ namespace SnakeServer
             UInt16 errorCode = Constants.ROOM_CREATE_SUCCESS;
 
             if (data.Length > 36)
-                return (Constants.ROOM_CREATE_FAILURE, room);
+                return (Constants.ROOM_PASSWORD_BAD, room);
 
             byte[] roomTypeBytes = new byte[2];
             byte[] roomNameBytes = new byte[15];
@@ -49,15 +49,21 @@ namespace SnakeServer
 
             if (room.roomType == Constants.ROOM_TYPE_PRIVATE)
             {
-                Array.Copy(data, 2, roomNameBytes, 0, 15);
-
+                try
+                {
+                    Array.Copy(data, 2, roomNameBytes, 0, 15);
+                }
+                catch
+                {
+                    return (Constants.ROOM_NAME_BAD, room);
+                }
                 try
                 {
                     Array.Copy(data, 17, roomPasswordBytes, 0, data.Length - 17);
                 }
                 catch
                 {
-                    return (Constants.ROOM_CREATE_FAILURE, room);
+                    return (Constants.ROOM_PASSWORD_BAD, room);
                 }
             }
 
@@ -82,6 +88,24 @@ namespace SnakeServer
             data[5] = response[1];
 
             return data;
+        }
+
+        public (UInt16, byte[]) IntToBytes(UInt16 msg, int resp)
+        {
+            byte[] data = new byte[8];
+            byte[] response = new byte[4];
+
+            UInt16 length = CalculateLength(ref response);
+            FillHeader(ref msg, length, ref data);
+
+            response = BitConverter.GetBytes(resp);
+
+            data[4] = response[0];
+            data[5] = response[1];
+            data[6] = response[2];
+            data[7] = response[3];
+
+            return (length, data);
         }
 
         void FillHeader(ref UInt16 messageNo, UInt16 len, ref byte[] data)

@@ -7,12 +7,14 @@ public class Functions : MonoBehaviour
     private NetworkManager networkManager;
     private UIManager uiManager;
     private PacketHelper packetHelper;
+    private GameManager gameManager;
 
     private void Awake()
     {
         networkManager = GetComponent<NetworkManager>();
         uiManager = GetComponent<UIManager>();
         packetHelper = new PacketHelper();
+        gameManager = GetComponent<GameManager>();
     }
 
     public void SubmitUserName()
@@ -21,6 +23,13 @@ public class Functions : MonoBehaviour
         name = uiManager.GetNameFromInputField();
 
         byte[] dataToSend = packetHelper.StringToBytes(Messages.SET_NAME_REQUEST, ref name);
+        networkManager.SendPacket(ref dataToSend);
+        Invoke("IdRequest", 0.2f);
+    }
+
+    public void IdRequest()
+    {
+        byte[] dataToSend = packetHelper.BlankMessage(Messages.USER_ID_REQUEST);
         networkManager.SendPacket(ref dataToSend);
     }
 
@@ -36,11 +45,19 @@ public class Functions : MonoBehaviour
         else
         {
             dataToSend = packetHelper.PrivateRoomToBytes(Messages.ROOM_CREATE_REQUEST, Constants.ROOM_TYPE_PRIVATE, uiManager.GetRoomName(), uiManager.GetRoomPassword());
-            
         }
 
         if(dataToSend.Length >= 4)
             networkManager.SendPacket(ref dataToSend);
+    }
+
+    public void AbandonGame()
+    {
+        if (gameManager.player._inRoom)
+        {
+            byte[] dataToSend = packetHelper.IntToBytes(Messages.ROOM_ABANDON_REQUEST, gameManager.currentRoom.roomId);
+            networkManager.SendPacket(ref dataToSend);
+        }
     }
 
     public void Logout()

@@ -14,6 +14,10 @@ namespace SnakeServer
 
         private static Dictionary<int, Client> _connectedClients = new Dictionary<int, Client>();
         public static Dictionary<string, int> _usedNames = new Dictionary<string, int>();
+
+        public static Dictionary<string, Room> _privateRooms = new Dictionary<string, Room>();
+        public static List<Room> _publicRooms = new List<Room>();
+
         private static Socket _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
         private static ServerHelper serverHelper = new ServerHelper();
@@ -125,6 +129,13 @@ namespace SnakeServer
                             break;
                         }
 
+                    case Messages.USER_ID_REQUEST:
+                        {
+                            message_number_send = Messages.USER_ID_RESPONSE;
+                            (lengthToSend, dataToSendTemp) = packetHelper.IntToBytes(message_number_send, clientId);
+                            break;
+                        }
+
 #region ROOM_MESSAGES
                     case Messages.ROOM_CREATE_REQUEST:
                         {
@@ -132,22 +143,77 @@ namespace SnakeServer
                             {
                                 (UInt16 errorCode, RoomStruct room) = packetHelper.BytesToRoomStruct(ref data);
 
-                                if(errorCode == Constants.ROOM_CREATE_FAILURE)
+                                message_number_send = Messages.ROOM_CREATE_RESPONSE;
+
+                                if (errorCode == Constants.ROOM_CREATE_FAILURE || errorCode == Constants.ROOM_NAME_BAD || errorCode == Constants.ROOM_PASSWORD_BAD)
                                 {
                                     Console.WriteLine("Room creation failed!");
+                                    (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, errorCode);
                                 }
 
                                 //Proceed
-                                if(errorCode == Constants.ROOM_CREATE_SUCCESS)
+                                else if(errorCode == Constants.ROOM_CREATE_SUCCESS)
                                 {
+                                    //reusing errorCode
+                                    errorCode = roomHelper.CheckRoomForErrors(ref room, _connectedClients[clientId]);
 
+                                    //if everything went good
+                                    if (errorCode == Constants.ROOM_CREATE_SUCCESS)
+                                    {
+                                        message_number_send = Messages.ROOM_CREATE_RESPONSE;
+                                        //Dont forget to check if user is already in a room, or owns one
+                                        Console.WriteLine("------------------------------------------------------------");
+                                        Console.WriteLine(clientId + " has created a room id: " + clientId);
+                                        Console.WriteLine("Room Type: " + room.roomType + "\nRoom Name: " + room.roomName + "\nRoom Password: " + room.roomPassword);
+                                        Console.WriteLine("------------------------------------------------------------");
+
+                                        if (room.roomType == Constants.ROOM_TYPE_PUBLIC)
+                                        {
+                                            Room newRoom = roomHelper.CreatePublicRoom(_connectedClients[clientId]);
+                                            _connectedClients[clientId].EnteredRoom(ref newRoom);
+
+                                            _publicRooms.Add(newRoom);
+                                        }
+                                        else
+                                        {
+                                            Room newRoom = roomHelper.CreatePrivateRoom(_connectedClients[clientId], ref room);
+                                            _connectedClients[clientId].EnteredRoom(ref newRoom);
+
+                                            _privateRooms.Add(room.roomName, newRoom);
+                                        }
+                                    }
+
+                                    (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, errorCode);
                                 }
 
-                                Console.WriteLine(room.roomType + " " + room.roomName + " " + room.roomPassword);
+                                
                             }
                             else
                             {
                                 Console.WriteLine("Invalid packet for room creation!");
+                            }
+                            break;
+                        }
+
+                        //gotta kick people off too
+                    case Messages.ROOM_ABANDON_REQUEST:
+                        {
+                            Console.WriteLine("------------------------------------------------------------");
+                            Console.WriteLine(clientId + " attempting to abandon room ID: " + clientId);
+                            Console.WriteLine("------------------------------------------------------------");
+
+                            message_number_send = Messages.ROOM_ABANDON_RESPONSE;
+                            int recieved_id = BitConverter.ToInt32(data, 0);
+
+                            UInt16 errorCode = roomHelper.AbandonRoom(_connectedClients[clientId], ref recieved_id);
+
+                            (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, errorCode);
+
+                            if(errorCode == Constants.ROOM_ABANDONED_SUCCESS)
+                            {
+                                Console.WriteLine("------------------------------------------------------------");
+                                Console.WriteLine(clientId + " succesffully abandoned room ID: " + clientId);
+                                Console.WriteLine("------------------------------------------------------------");
                             }
                             break;
                         }
@@ -158,7 +224,7 @@ namespace SnakeServer
                 }
 #endregion
 
-
+#region DATA_SEND
                 byte[] dataToSend = new byte[lengthToSend];
                 Array.Copy(dataToSendTemp, dataToSend, lengthToSend);
 
@@ -167,7 +233,7 @@ namespace SnakeServer
                     serverHelper.PrintSendingData(clientId, message_number_send, lengthToSend, ref dataToSend);
                     socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
                 }
-
+#endregion
                 socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(RecieveCallback), socket);
             }
 

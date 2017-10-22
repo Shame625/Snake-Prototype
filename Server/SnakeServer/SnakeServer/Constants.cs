@@ -39,13 +39,20 @@ namespace SnakeServer
         //Room error codes
         public static UInt16 ROOM_NAME_BAD { get { return 0x0000; } }
         public static UInt16 ROOM_PASSWORD_BAD { get { return 0x0001; } }
-        public static UInt16 ROOM_TYPE_BAD { get { return 0x0003; } }
-        public static UInt16 ROOM_NAME_OK { get { return 0x0004; } }
-        public static UInt16 ROOM_PASSWORD_OK { get { return 0x0005; } }
-        public static UInt16 ROOM_TYPE_OK { get { return 0x0006; } }
+        public static UInt16 ROOM_TYPE_BAD { get { return 0x0002; } }
+        public static UInt16 ROOM_NAME_OK { get { return 0x0003; } }
+        public static UInt16 ROOM_PASSWORD_OK { get { return 0x0004; } }
+        public static UInt16 ROOM_TYPE_OK { get { return 0x0005; } }
+        public static UInt16 ROOM_NAME_IN_USE { get { return 0x0006; } }
 
         public static UInt16 ROOM_CREATE_FAILURE { get { return 0x00FE; } }
         public static UInt16 ROOM_CREATE_SUCCESS { get { return 0x00FF; } }
+
+
+        public static UInt16 ROOM_ABANDONED_SUCCESS { get { return 0x0006; } }
+        public static UInt16 ROOM_ABANDONED_FAILURE { get { return 0x0007; } }
+        public static UInt16 ROOM_LEAVE_SUCCESS { get { return 0x0008; } }
+        public static UInt16 ROOM_LEAVE_FAILURE { get { return 0x0009; } }
 
     }
 }

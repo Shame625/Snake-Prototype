@@ -40,14 +40,32 @@ class Constants
 
     public static UInt16 ROOM_TYPE_PUBLIC { get { return 0x0000; } }
     public static UInt16 ROOM_TYPE_PRIVATE { get { return 0x0001; } }
-    
+
     //Room error codes
     public static UInt16 ROOM_NAME_BAD { get { return 0x0000; } }
     public static UInt16 ROOM_PASSWORD_BAD { get { return 0x0001; } }
-    public static UInt16 ROOM_TYPE_BAD { get { return 0x0003; } }
+    public static UInt16 ROOM_TYPE_BAD { get { return 0x0002; } }
+    public static UInt16 ROOM_NAME_OK { get { return 0x0003; } }
+    public static UInt16 ROOM_PASSWORD_OK { get { return 0x0004; } }
+    public static UInt16 ROOM_TYPE_OK { get { return 0x0005; } }
+    public static UInt16 ROOM_NAME_IN_USE { get { return 0x0006; } }
+
+    public static UInt16 ROOM_ABANDONED_SUCCESS { get { return 0x0006; } }
+    public static UInt16 ROOM_ABANDONED_FAILURE { get { return 0x0007; } }
+    public static UInt16 ROOM_LEAVE_SUCCESS { get { return 0x0008; } }
+    public static UInt16 ROOM_LEAVE_FAILURE { get { return 0x0009; } }
+
+    public static UInt16 ROOM_CREATE_FAILURE { get { return 0x00FE; } }
+    public static UInt16 ROOM_CREATE_SUCCESS { get { return 0x00FF; } }
 
     //Room error messages
-    public static string ROOM_NAME_BAD_ERROR_MSG { get { return "Bad room name, must be between " + ROOM_NAME_LENGTH_MIN + " and " + ROOM_NAME_LENGTH_MAX + " 16 characters, and cannot contain special characters!"; } }
-    public static string ROOM_NAME_BAD_PASSWORD_MSG { get { return "Bad password, must be 'blank' or between " + ROOM_PASSWORD_LENGTH_MIN + " and " + ROOM_PASSWORD_LENGTH_MAX + " characters long!"; } }
-
+    public static string ROOM_NAME_BAD_MSG { get { return "Bad room name, must be between " + ROOM_NAME_LENGTH_MIN + " and " + ROOM_NAME_LENGTH_MAX + " characters, and cannot contain special characters!"; } }
+    public static string ROOM_NAME_BAD_PASSWORD_MSG { get { return "Bad password, must be 'blank' or between " + ROOM_PASSWORD_LENGTH_MIN + " and " + ROOM_PASSWORD_LENGTH_MAX + " characters long, and cannot contain special characters!"; } }
+    public static string ROOM_UNKNOWN_ERROR { get { return "Unknown error occured!"; } }
+    public static string ROOM_ALREADY_IN { get { return "You are already in a room!"; } }
+    public static string ROOM_NAME_IN_USE_MSG { get { return "Room with the same name already exists!"; } }
+    public static string ROOM_ABANDONED_SUCCESS_MSG { get { return "You have abandoned the room!"; } }
+    public static string ROOM_ABANDONED_FAILED_MSG { get { return "You have failed to abandoned the room!"; } }
+    public static string ROOM_LEAVE_SUCCESS_MSG { get { return "You have left the room!"; } }
+    public static string ROOM_LEAVE_FAILED_MSG { get { return "You have failed to leave the room!"; } }
 }

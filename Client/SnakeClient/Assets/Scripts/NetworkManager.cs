@@ -68,7 +68,6 @@ public class NetworkManager : MonoBehaviour
         
         try
         {
-            
             int recieved = _clientSocket.EndReceive(AR);
 
             if (recieved == 0)
@@ -129,6 +128,17 @@ public class NetworkManager : MonoBehaviour
                         }
                         break;
                     }
+                case Messages.USER_ID_RESPONSE:
+                    {
+                        int server_response = packetHelper.BytesToInt(ref data);
+
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.idRecieved(server_response);
+                        });
+
+                        break;
+                    }
                 case Messages.USER_DISCONNECT:
                     {
                         UInt16 server_response = packetHelper.BytesToUInt16(ref data);
@@ -157,6 +167,42 @@ public class NetworkManager : MonoBehaviour
                                     networkHelper.loggedOut(Constants.LOGOUT_FORCED);
                                 });
                             }
+                        }
+                        break;
+                    }
+                case Messages.ROOM_CREATE_RESPONSE:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+
+                        //Decoding
+                        {
+                            if(server_response == Constants.ROOM_CREATE_SUCCESS)
+                            {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.roomCreatedSuccessfull();
+                                });
+                            }
+                            else
+                            {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.roomCreationFailed(ref server_response);
+                                });
+                            }
+                        }
+                        break;
+                    }
+                case Messages.ROOM_ABANDON_RESPONSE:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+
+                        //Decoding
+                        {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.roomAbandonedCheck(ref server_response);
+                                });
                         }
                         break;
                     }

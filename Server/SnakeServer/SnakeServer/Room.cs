@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SnakeServer
 {
 
-    class Room
+    public class Room
     {
         public UInt16 _type { get; }
 
@@ -15,15 +15,15 @@ namespace SnakeServer
         public string _roomName { get; }
         string _roomPassword;
 
-        int[] _players;
+        Client[] refClients = new Client[2];
 
-        int _roomAdmin;
+        public Client _roomAdmin { get; set; }
 
-        public Room(UInt16 t, int id, string name, string password)
+        public Room(Client c, UInt16 t, int id, string name, string password)
         {
             _type = t;
             _roomId = id;
-            _roomAdmin = id;
+            _roomAdmin = c;
 
             if (_type == Constants.ROOM_TYPE_PRIVATE)
             {
@@ -32,7 +32,35 @@ namespace SnakeServer
             }
         }
 
+        public Room(Client c, UInt16 t, int id)
+        {
+            _type = t;
+            _roomId = id;
+            _roomAdmin = c;
+        }
 
+        public void AddPlayer(ref Client c)
+        {
+            if(c._isAllowed)
+            {
+                if(!c._isInRoom)
+                {
+                    if(refClients[0] == null)
+                    {
+                        refClients[0] = c;
+                    }
+                    else if(refClients[1] == null)
+                    {
+                        refClients[1] = c;
+                    }
+                }
+            }
+        }
+
+        public void SetAdmin(Client c)
+        {
+
+        }
 
     }
 }

@@ -72,6 +72,11 @@ public class NetworkHelper : MonoBehaviour
         uiManager.CheckConnectionUI();
     }
 
+    public void idRecieved(int id)
+    {
+        gameManager.player._id = id;
+    }
+
     public void userNameOK()
     {
         gameManager.player.SetName(ref gameManager.enteredName);
@@ -80,6 +85,8 @@ public class NetworkHelper : MonoBehaviour
 
     public void userNameBAD(UInt16 err)
     {
+        if(err == Constants.USER_LOGGED_IN)
+            uiManager.DisplayMainMenuUI();
         uiManager.UserNameErrorUI(ref err);
     }
 
@@ -92,6 +99,32 @@ public class NetworkHelper : MonoBehaviour
         uiManager.DisconnectedFromServerUI(code);
     }
 
+    public void roomCreatedSuccessfull()
+    {
+        gameManager.player._inRoom = true;
+
+        Room newRoom = new Room(true);
+        newRoom.roomId = gameManager.player._id;
+        newRoom.roomType = gameManager.enteredroomType;
+
+        gameManager.SetRoom(ref newRoom);
+
+        uiManager.RoomCreatedUI();
+    }
+
+    public void roomCreationFailed(ref UInt16 errorCode)
+    {
+        uiManager.RoomCreationFailedUI(errorCode);
+    }
+
+    public void roomAbandonedCheck(ref UInt16 errorCode)
+    {
+        if(errorCode == Constants.ROOM_ABANDONED_SUCCESS)
+        {
+            gameManager.currentRoom = null;
+        }
+        uiManager.AbandonRoomUI(errorCode);
+    }
 
     public string PrintBytes(ref byte[] byteArray)
     {
