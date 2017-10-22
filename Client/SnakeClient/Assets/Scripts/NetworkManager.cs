@@ -299,6 +299,37 @@ public class NetworkManager : MonoBehaviour
                         break;
                     }
 
+                case Messages.ROOM_LEAVE_RESPONSE:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+
+                        if(server_response == Constants.ROOM_LEAVE_SUCCESS)
+                        {
+                            UnityThreadHelper.Dispatcher.Dispatch(() =>
+                            {
+                                networkHelper.leaveRoomSuccessful();
+                            });
+                        }
+                        else
+                        {
+                            UnityThreadHelper.Dispatcher.Dispatch(() =>
+                            {
+                                networkHelper.leaveRoomFailed();
+                            });
+                        }
+
+                        break;
+                    }
+
+                case Messages.ROOM_PLAYER_LEFT_MY_ROOM:
+                    {
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.playerLeftMyRoom();
+                        });
+                        break;
+                    }
+
                 case Messages.ROOM_CLOSED:
                     {
                         UnityThreadHelper.Dispatcher.Dispatch(() =>

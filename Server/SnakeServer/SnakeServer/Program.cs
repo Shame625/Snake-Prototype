@@ -10,7 +10,7 @@ namespace SnakeServer
     {
         public static int counter = 0;
 
-        private static byte[] _buffer = new byte[4096];
+        private static byte[] _buffer = new byte[Constants.RECEIVE_BUFFER_SIZE];
 
         public static Dictionary<int, Client> _connectedClients = new Dictionary<int, Client>();
         public static Dictionary<string, int> _usedNames = new Dictionary<string, int>();
@@ -34,12 +34,20 @@ namespace SnakeServer
 
         private static void SetupServer()
         {
+            Console.WriteLine("---------------------------------------------------------");
+            Console.WriteLine("Property of Yee Studios Inc.\nDeveloped by: Yee Studios Inc.");
+            Console.WriteLine("---------------------------------------------------------\n");
+            Console.WriteLine("---------------------------------------------------------");
             Console.WriteLine("Setting up server...");
             _serverSocket.Bind(new IPEndPoint(IPAddress.Any, 100));
             _serverSocket.Listen(5);
             _serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
+
+            Console.WriteLine("Frequency of queue dumps set to " + Constants.QUEUE_TIMER_TICK_MILISECONDS + " ms.");
+            Console.WriteLine("Receive buffer size set to " + Constants.RECEIVE_BUFFER_SIZE + " bytes.");
+            Console.WriteLine("Send buffer size set to " + Constants.SEND_BUFFER_SIZE + " bytes.");
             Console.WriteLine("Server is running!");
-            Console.WriteLine("Frequency of queue dumps: " + Constants.QUEUE_TIMER_TICK_MILISECONDS + "ms.");
+            Console.WriteLine("---------------------------------------------------------");
 
             var startTimeSpan = TimeSpan.Zero;
             var periodTimeSpan = TimeSpan.FromMilliseconds(Constants.QUEUE_TIMER_TICK_MILISECONDS);
@@ -98,7 +106,7 @@ namespace SnakeServer
                 //Breaking down buffer into segments
                 byte[] message_number_bytes = new byte[2];
                 byte[] packet_length_bytes = new byte[2];
-                byte[] data = new byte[512];
+                byte[] data = new byte[Constants.SEND_BUFFER_SIZE];
 
                 try
                 {
@@ -303,6 +311,34 @@ namespace SnakeServer
                             }
                         }
                         break;
+
+                    case Messages.ROOM_LEAVE_REQUEST:
+                        {
+                            message_number_send = Messages.ROOM_LEAVE_RESPONSE;
+                            
+                            {
+                                if(_connectedClients[clientId]._isInRoom)
+                                {
+                                    Console.WriteLine(clientId + " has left the room id: " + _connectedClients[clientId]._currentRoom._roomId);
+
+                                    int p1id = _connectedClients[clientId]._currentRoom._roomAdmin._clientId;
+
+                                    _connectedClients[clientId]._currentRoom.RemovePlayer2();
+                                    _connectedClients[clientId].ClearStatus();
+                                    (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, Constants.ROOM_LEAVE_SUCCESS);
+
+                                    //Tell other player of room that player has left.
+                                    SendDataPlayerLeftRoom(p1id);
+                                }
+                                else
+                                {
+                                    (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, Constants.ROOM_LEAVE_FAILURE);
+                                }
+                            }
+
+                            break;
+                        }
+
                     #endregion
                     case Messages.BAD_PACKET:
                         {
@@ -323,7 +359,14 @@ namespace SnakeServer
                 if (lengthToSend > 0)
                 {
                     serverHelper.PrintSendingData(clientId, message_number_send, lengthToSend, ref dataToSend);
-                    socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
+                    try
+                    {
+                        socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
+                    }
+                    catch
+                    {
+
+                    }
                 }
 #endregion
                 socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, new AsyncCallback(RecieveCallback), socket);
@@ -345,10 +388,25 @@ namespace SnakeServer
 
             if (_connectedClients[socket.GetHashCode()]._currentRoom != null)
             {
-                _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
+                int id = _connectedClients[socket.GetHashCode()]._currentRoom._roomAdmin._clientId;
 
-                //Callback to admin of a room needed here
-                SendDataPlayerLeftRoom();
+                //if user is admin, kick other guy
+                if(socket.GetHashCode() == id)
+                {
+                    Room r = _connectedClients[socket.GetHashCode()]._currentRoom;
+                    try
+                    {
+                        SendDataRoomAbandoned(_connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._socket, _connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._clientId);
+                    }
+                    catch
+                    { }
+                    roomHelper.DestroyRoom(r);
+                }
+                else
+                {
+                    SendDataPlayerLeftRoom(id);
+                    _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
+                }
             }
             try
             {
@@ -376,14 +434,20 @@ namespace SnakeServer
             Console.WriteLine("Player 2" + c._userName);
             serverHelper.PrintSendingData(c._clientId, Messages.ROOM_JOINED_MY_ROOM, Convert.ToUInt16(dataToSendP2.Length), ref dataToSendP2);
             //player 1
-            r._roomAdmin._socket.BeginSend(dataToSendP1, 0, dataToSendP1.Length, SocketFlags.None, new AsyncCallback(SendCallback), r._roomAdmin._socket);
-            
+            try
+            {
+                r._roomAdmin._socket.BeginSend(dataToSendP1, 0, dataToSendP1.Length, SocketFlags.None, new AsyncCallback(SendCallback), r._roomAdmin._socket);
+            }
+            catch { }
             //player 2
             c.EnteredRoom(ref r);
 
             r.AddPlayer(ref c);
-
-            c._socket.BeginSend(dataToSendP2, 0, dataToSendP2.Length, SocketFlags.None, new AsyncCallback(SendCallback), c._socket);
+            try
+            {
+                c._socket.BeginSend(dataToSendP2, 0, dataToSendP2.Length, SocketFlags.None, new AsyncCallback(SendCallback), c._socket);
+            }
+            catch { }
         }
 
         public static void SendDataRoomAbandoned(Socket s, int id)
@@ -395,9 +459,13 @@ namespace SnakeServer
             s.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), s);
         }
 
-        public static void SendDataPlayerLeftRoom()
+        public static void SendDataPlayerLeftRoom(int id)
         {
+            byte[] dataToSend = new byte[Constants.MESSAGE_BASE];
 
+            packetHelper.FillHeaderBlankData(Messages.ROOM_PLAYER_LEFT_MY_ROOM, ref dataToSend);
+            if(_connectedClients.ContainsKey(id))
+                _connectedClients[id]._socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), _connectedClients[id]._socket);
         }
 
         //Queue system
@@ -453,10 +521,27 @@ namespace SnakeServer
 
             if(_connectedClients[socket.GetHashCode()]._currentRoom != null)
             {
-                _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
+                int id = _connectedClients[socket.GetHashCode()]._currentRoom._roomAdmin._clientId;
 
-                //Callback to admin needed here
-                SendDataPlayerLeftRoom();
+                //if user is admin, kick other guy
+                if (socket.GetHashCode() == id)
+                {
+                    Room r = _connectedClients[socket.GetHashCode()]._currentRoom;
+                    try
+                    {
+                        SendDataRoomAbandoned(_connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._socket, _connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._clientId);
+                    }
+                    catch
+                    {
+
+                    }
+                    roomHelper.DestroyRoom(r);
+                }
+                else
+                {
+                    SendDataPlayerLeftRoom(id);
+                    _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
+                }
             }
 
             if (_connectedClients.ContainsKey(socket.GetHashCode()))

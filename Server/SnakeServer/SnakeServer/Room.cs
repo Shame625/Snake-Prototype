@@ -61,10 +61,5 @@ namespace SnakeServer
             _isEmpty = true;
         }
 
-        public void SetAdmin(Client c)
-        {
-
-        }
-
     }
 }

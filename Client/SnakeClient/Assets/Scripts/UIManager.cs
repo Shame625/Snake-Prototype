@@ -39,6 +39,7 @@ public class UIManager : MonoBehaviour
     //In room commands
     public Text player1;
     public Text player2;
+    public GameObject player2LoadingBar;
     public Text roomTitle;
     public Button AbandonButton;
 
@@ -151,12 +152,13 @@ public class UIManager : MonoBehaviour
     public void RoomCreatedUI()
     {
         player1.text = gameManager.player._userName;
+        player2.text = "";
+        player2LoadingBar.SetActive(true);
 
         if(gameManager.currentRoom.roomType == Constants.ROOM_TYPE_PRIVATE)
             roomTitle.text = gameManager.enteredRoomName;
         else
             roomTitle.text = "Public room";
-        AbandonButton.GetComponentInChildren<Text>().text = "Abandon Room";
 
         DisplayRoomPanelUI();
     }
@@ -166,12 +168,25 @@ public class UIManager : MonoBehaviour
         player1.text = gameManager.player._userName;
         player2.text = gameManager.opponent._userName;
 
-
+        if(gameManager.currentRoom.isAdmin)
+        {
+            AbandonButton.GetComponentInChildren<Text>().text = "Abandon Room";
+        }
+        else
+        {
+            AbandonButton.GetComponentInChildren<Text>().text = "Leave Room";
+        }
 
         createRoomPanel.SetActive(false);
         inRoomPanel.SetActive(true);
         findGamePanel.SetActive(false);
         findingPublicGamePanel.SetActive(false);
+    }
+
+    public void PlayerLeftMyRoomUI()
+    {
+        player2.text = "";
+        player2LoadingBar.SetActive(true);
     }
 
     public void RoomTypeChangedUI()
@@ -215,11 +230,13 @@ public class UIManager : MonoBehaviour
     public void PlayerJoinedMyRoomUI()
     {
         player2.text = gameManager.opponent._userName;
+        player2LoadingBar.SetActive(false);
     }
 
     public void JoinedRoomUI()
     {
         player2.text = gameManager.opponent._userName;
+        player2LoadingBar.SetActive(false);
         DisplayRoomPanelUI();
     }
 
@@ -279,6 +296,7 @@ public class UIManager : MonoBehaviour
         if(errorCode == Constants.ROOM_ABANDONED_SUCCESS)
         {
             ShowErrorPanel(Constants.ROOM_ABANDONED_SUCCESS_MSG);
+            ClearUI();
             DisplayVsPlayerPanelUI();
         }
         else
@@ -340,5 +358,12 @@ public class UIManager : MonoBehaviour
         temp.GetComponent<PacketUI>().SetPrefab(t, s);
 
         packetHistoryScrollbar.value = 0.0f ;
+    }
+
+    public void ClearUI()
+    {
+        statusTextConnection.text = "";
+        userNameTextStatus.text = "";
+        roomCreationStatus.text = "";
     }
 }

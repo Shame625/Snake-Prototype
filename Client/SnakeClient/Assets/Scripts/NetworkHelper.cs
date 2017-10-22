@@ -118,10 +118,20 @@ public class NetworkHelper : MonoBehaviour
         uiManager.PlayerJoinedMyRoomUI();
     }
 
+    public void playerLeftMyRoom()
+    {
+        gameManager.opponent._userName = "";
+
+        uiManager.ShowErrorPanel(Constants.ROOM_PLAYER_LEFT_MY_ROOM);
+        uiManager.PlayerLeftMyRoomUI();
+    }
+
     public void joinedRoom(int id, string name)
     {
         gameManager.opponent._userName = name;
         gameManager.currentRoom.isAdmin = false;
+        gameManager.player._findingRoom = false;
+        gameManager.player._inRoom = true;
         uiManager.JoinedRoomUI();
     }
 
@@ -172,6 +182,18 @@ public class NetworkHelper : MonoBehaviour
             gameManager.player._inRoom = false;
         }
         uiManager.AbandonRoomUI(errorCode);
+    }
+
+    public void leaveRoomSuccessful()
+    {
+        gameManager.player._inRoom = false;
+        uiManager.ShowErrorPanel(Constants.ROOM_LEAVE_SUCCESS_MSG);
+        uiManager.DisplayVsPlayerPanelUI();
+    }
+
+    public void leaveRoomFailed()
+    {
+        uiManager.ShowErrorPanel(Constants.ROOM_LEAVE_FAILED_MSG);
     }
 
     public string PrintBytes(ref byte[] byteArray)

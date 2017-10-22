@@ -82,4 +82,5 @@ class Constants
     public static string ROOM_LEAVE_FAILED_MSG { get { return "You have failed to leave the room!"; } }
     public static string ROOM_JOIN_FAILURE_MSG { get { return "Failed to look for a room, are you in a room already?"; } }
     public static string ROOM_CANCEL_FINDING_FAILURE_MSG { get { return "Failed to cancel finding a room!"; } }
+    public static string ROOM_PLAYER_LEFT_MY_ROOM { get { return "Player has left the group."; } }
 }

@@ -61,9 +61,21 @@ public class Functions : MonoBehaviour
     {
         if (gameManager.player._inRoom)
         {
-            byte[] dataToSend = packetHelper.IntToBytes(Messages.ROOM_ABANDON_REQUEST, gameManager.currentRoom.roomId);
-            networkManager.SendPacket(ref dataToSend);
+            if (gameManager.currentRoom.isAdmin)
+            {
+                byte[] dataToSend = packetHelper.IntToBytes(Messages.ROOM_ABANDON_REQUEST, gameManager.currentRoom.roomId);
+                networkManager.SendPacket(ref dataToSend);
+            }
+            else
+                LeaveRoom();
         }
+    }
+
+    public void LeaveRoom()
+    {
+            byte[] dataToSend = new byte[4];
+            packetHelper.FillHeaderBlankData(Messages.ROOM_LEAVE_REQUEST, ref dataToSend);
+            networkManager.SendPacket(ref dataToSend);
     }
 
     public void FindPublicGame()
