@@ -6,7 +6,7 @@ namespace SnakeServer
     {
         //Server constants
         public static int QUEUE_TIMER_TICK_MILISECONDS { get { return 15; } }
-        public static int RECEIVE_BUFFER_SIZE { get { return 2048; } }
+        public static int RECEIVE_BUFFER_SIZE { get { return 4096; } }
         public static int SEND_BUFFER_SIZE { get { return 512; } }
 
         public static UInt16 MESSAGE_BASE { get { return 4; } }

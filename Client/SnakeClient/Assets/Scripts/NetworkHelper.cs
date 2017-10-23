@@ -179,8 +179,6 @@ public class NetworkHelper : MonoBehaviour
 
     public void roomPrivateJoinedSuccess(string roomName, string opponentName)
     {
-        Debug.Log("joined private room");
-
         gameManager.currentRoom.roomName = roomName;
         gameManager.currentRoom.isAdmin = false;
         gameManager.opponent._userName = opponentName;

@@ -21,12 +21,16 @@ namespace SnakeServer
 
         public bool _isEmpty { get; set; }
 
+        Game game;
+
         public Room(Client c, UInt16 t, int id, string name, string password)
         {
             _type = t;
             _roomId = id;
             _roomAdmin = c;
             _isEmpty = true;
+
+            game = new Game();
 
             if (_type == Constants.ROOM_TYPE_PRIVATE)
             {
@@ -41,6 +45,8 @@ namespace SnakeServer
             _roomId = id;
             _roomAdmin = c;
             _isEmpty = true;
+
+            game = new Game();
         }
 
         public void AddPlayer(ref Client c)
@@ -59,6 +65,21 @@ namespace SnakeServer
                 refClients[1] = null;
             }
             _isEmpty = true;
+        }
+
+        public void StartGame()
+        {
+
+        }
+
+        void EndGame()
+        {
+
+        }
+
+        public void DestroyGame()
+        {
+
         }
 
     }

@@ -46,8 +46,11 @@ namespace SnakeServer
             Console.WriteLine("Frequency of queue dumps set to " + Constants.QUEUE_TIMER_TICK_MILISECONDS + " ms.");
             Console.WriteLine("Receive buffer size set to " + Constants.RECEIVE_BUFFER_SIZE + " bytes.");
             Console.WriteLine("Send buffer size set to " + Constants.SEND_BUFFER_SIZE + " bytes.");
+            Console.WriteLine("Loading maps...");
             Console.WriteLine("Server is running!");
             Console.WriteLine("---------------------------------------------------------");
+
+            MapManager.LoadMaps();
 
             var startTimeSpan = TimeSpan.Zero;
             var periodTimeSpan = TimeSpan.FromMilliseconds(Constants.QUEUE_TIMER_TICK_MILISECONDS);
@@ -88,7 +91,7 @@ namespace SnakeServer
 
                     return;
                 }
-                else if (recieved > 1024)
+                else if (recieved > 512)
                 {
                     DisconnectUser(ref socket);
                     return;
