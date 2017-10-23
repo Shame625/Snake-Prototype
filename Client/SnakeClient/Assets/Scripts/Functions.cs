@@ -90,7 +90,14 @@ public class Functions : MonoBehaviour
 
     public void FindPrivateGame()
     {
+        string name = uiManager.GetPrivateRoomName();
+        string password = uiManager.GetPrivateRoomPassword();
 
+        if (!gameManager.player._inRoom)
+        {
+            byte[] dataToSend = packetHelper.JoinPrivateRoomToBytes(Messages.ROOM_JOIN_PRIVATE_ROOM_REQUEST, name, password);
+            networkManager.SendPacket(ref dataToSend);
+        }
     }
 
     public void CancelFindingPublicGame()

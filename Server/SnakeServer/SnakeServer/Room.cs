@@ -13,7 +13,7 @@ namespace SnakeServer
 
         public int _roomId { get; }
         public string _roomName { get; }
-        string _roomPassword;
+        public string _roomPassword { get; }
 
         public Client[] refClients = new Client[2];
 

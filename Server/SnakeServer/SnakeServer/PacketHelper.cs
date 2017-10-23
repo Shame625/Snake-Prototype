@@ -100,6 +100,33 @@ namespace SnakeServer
             return (errorCode, room);
         }
 
+        public (RoomStruct, UInt16) DecodeJoinPrivateRoom(ref byte[] data)
+        {
+            byte[] roomNameBytes = new byte[Constants.ROOM_NAME_LENGTH_MAX-1];
+            byte[] roomPasswordBytes;
+            string password = "";
+
+            Array.Copy(data, roomNameBytes, 15);
+
+            string roomName = Encoding.ASCII.GetString(roomNameBytes);
+
+            if(data.Length >= Constants.ROOM_NAME_LENGTH_MAX-1)
+            {
+                roomPasswordBytes = new byte[data.Length - (Constants.ROOM_NAME_LENGTH_MAX - 1)];
+                Array.Copy(data, Constants.ROOM_NAME_LENGTH_MAX - 1, roomPasswordBytes, 0, roomPasswordBytes.Length);
+                password = Encoding.ASCII.GetString(roomPasswordBytes);
+            }
+
+            Console.WriteLine(roomName);
+
+            RoomStruct room = new RoomStruct();
+            room.roomType = Constants.ROOM_TYPE_PRIVATE;
+            room.roomName = roomName;
+            room.roomPassword = password;
+
+            return (room, Constants.ROOM_PRIVATE_JOIN_SUCCESS);
+        }
+
         public byte[] UInt16ToBytesNoLen(UInt16 msg, UInt16 resp)
         {
             byte[] data = new byte[6];

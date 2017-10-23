@@ -33,8 +33,14 @@ public class NetworkManager : MonoBehaviour
 
     public void LoopConnect()
     {
+
+        //string ipaddr = "93.142.164.223";
+        //IPAddress myAdd = IPAddress.Parse(ipaddr);
+        //IPEndPoint ip = new IPEndPoint(myAdd, 50000);
+
         _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 100);
+
+        IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 50000);
         _clientSocket.BeginConnect(endPoint, ConnectCallback, null);
     }
 
@@ -245,7 +251,30 @@ public class NetworkManager : MonoBehaviour
 
                         break;
                 }
+                case Messages.ROOM_JOIN_PRIVATE_ROOM_RESPONSE:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
 
+                        //Decoding
+                        {
+                            if (server_response == Constants.ROOM_PRIVATE_JOIN_SUCCESS)
+                            {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.roomPrivateJoinedSuccess();
+                                });
+                            }
+                            else
+                            {
+                                UnityThreadHelper.Dispatcher.Dispatch(() =>
+                                {
+                                    networkHelper.roomPrivateJoinedFailure(ref server_response);
+                                });
+                            }
+                        }
+
+                        break;
+                    }
                 case Messages.ROOM_CANCEL_FINDING_RESPONSE:
                     {
                         UInt16 server_response = packetHelper.BytesToUInt16(ref data);

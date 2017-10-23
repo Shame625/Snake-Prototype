@@ -49,6 +49,10 @@ namespace SnakeServer
         public static UInt16 ROOM_PASSWORD_OK { get { return 0x0004; } }
         public static UInt16 ROOM_TYPE_OK { get { return 0x0005; } }
         public static UInt16 ROOM_NAME_IN_USE { get { return 0x0006; } }
+        public static UInt16 ROOM_FULL { get { return 0x0007; } }
+
+        public static UInt16 ROOM_PRIVATE_JOIN_SUCCESS { get { return 0x0009; } }
+        public static UInt16 ROOM_PRIVATE_JOIN_FAILURE { get { return 0x0010; } }
 
         public static UInt16 ROOM_CREATE_FAILURE { get { return 0x00FE; } }
         public static UInt16 ROOM_CREATE_SUCCESS { get { return 0x00FF; } }

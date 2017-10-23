@@ -50,6 +50,10 @@ class Constants
     public static UInt16 ROOM_PASSWORD_OK { get { return 0x0004; } }
     public static UInt16 ROOM_TYPE_OK { get { return 0x0005; } }
     public static UInt16 ROOM_NAME_IN_USE { get { return 0x0006; } }
+    public static UInt16 ROOM_FULL { get { return 0x0007; } }
+
+    public static UInt16 ROOM_PRIVATE_JOIN_SUCCESS { get { return 0x0009; } }
+    public static UInt16 ROOM_PRIVATE_JOIN_FAILURE { get { return 0x0010; } }
 
     public static UInt16 ROOM_ABANDONED_SUCCESS { get { return 0x0000; } }
     public static UInt16 ROOM_ABANDONED_FAILURE { get { return 0x0001; } }
@@ -83,4 +87,7 @@ class Constants
     public static string ROOM_JOIN_FAILURE_MSG { get { return "Failed to look for a room, are you in a room already?"; } }
     public static string ROOM_CANCEL_FINDING_FAILURE_MSG { get { return "Failed to cancel finding a room!"; } }
     public static string ROOM_PLAYER_LEFT_MY_ROOM { get { return "Player has left the group."; } }
+    public static string ROOM_PRIVATE_NAME_BAD_MSG { get { return "Room does not exist!"; } }
+    public static string ROOM_PRIVATE_PASSWORD_BAD_MSG { get { return "Wrong password!"; } }
+    public static string ROOM_FULL_MSG { get { return "Room is full!"; } }
 }

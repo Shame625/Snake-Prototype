@@ -23,12 +23,18 @@ public class UIManager : MonoBehaviour
     public GameObject inRoomPanel;
     public GameObject findGamePanel;
     public GameObject findingPublicGamePanel;
+    public GameObject findPrivateGamePanel;
 
     public InputField nameInputField;
     public Button connectButton;
     public Text statusTextConnection;
     public Text userNameTextStatus;
     public Text userNameText;
+
+    //Find private room
+    public InputField privateRoomNameInput;
+    public InputField privateRoomPasswordInput;
+    public Text privateRoomTextStatus;
 
     //Room create
     public Dropdown roomTypeDropdown;
@@ -42,7 +48,6 @@ public class UIManager : MonoBehaviour
     public GameObject player2LoadingBar;
     public Text roomTitle;
     public Button AbandonButton;
-
 
     //Error panel
     public GameObject errorPanel;
@@ -95,6 +100,7 @@ public class UIManager : MonoBehaviour
         inRoomPanel.SetActive(false);
         findGamePanel.SetActive(false);
         findingPublicGamePanel.SetActive(false);
+        HideDisplayFindPrivateGamePanelUI();
     }
 
     public void DisplaySubmitUserNamePanelUI()
@@ -108,6 +114,7 @@ public class UIManager : MonoBehaviour
         createRoomPanel.SetActive(false);
         inRoomPanel.SetActive(false);
         findGamePanel.SetActive(false);
+        HideDisplayFindPrivateGamePanelUI();
     }
 
     public void DisplayMainMenuUI()
@@ -119,6 +126,7 @@ public class UIManager : MonoBehaviour
         createRoomPanel.SetActive(false);
         inRoomPanel.SetActive(false);
         findGamePanel.SetActive(false);
+        HideDisplayFindPrivateGamePanelUI();
 
         userNameText.text = "Welcome " + gameManager.player._userName;
     }
@@ -130,6 +138,7 @@ public class UIManager : MonoBehaviour
         createRoomPanel.SetActive(false);
         inRoomPanel.SetActive(false);
         findGamePanel.SetActive(false);
+        HideDisplayFindPrivateGamePanelUI();
     }
 
     public void DisplayCreateGamePanelUI()
@@ -139,6 +148,7 @@ public class UIManager : MonoBehaviour
         vsPlayerPanel.SetActive(false);
         createRoomPanel.SetActive(true);
         inRoomPanel.SetActive(false);
+        HideDisplayFindPrivateGamePanelUI();
     }
 
     public void DisplayFindGamePanelUI()
@@ -147,12 +157,24 @@ public class UIManager : MonoBehaviour
         vsPlayerPanel.SetActive(false);
         findingPublicGamePanel.SetActive(false);
         inRoomPanel.SetActive(false);
+        HideDisplayFindPrivateGamePanelUI();
+    }
+
+    public void DisplayFindPrivateGamePanelUI()
+    {
+        findPrivateGamePanel.SetActive(true);
+    }
+
+    public void HideDisplayFindPrivateGamePanelUI()
+    {
+        findPrivateGamePanel.SetActive(false);
     }
 
     public void RoomCreatedUI()
     {
         player1.text = gameManager.player._userName;
         player2.text = "";
+
         player2LoadingBar.SetActive(true);
 
         if(gameManager.currentRoom.roomType == Constants.ROOM_TYPE_PRIVATE)
@@ -240,6 +262,22 @@ public class UIManager : MonoBehaviour
         DisplayRoomPanelUI();
     }
 
+    public void RoomPrivateErrorUI(UInt16 errorCode)
+    {
+        if(errorCode == Constants.ROOM_NAME_BAD)
+        {
+            privateRoomTextStatus.text = Constants.ROOM_PRIVATE_NAME_BAD_MSG;
+        }
+        else if (errorCode == Constants.ROOM_PASSWORD_BAD)
+        {
+            privateRoomTextStatus.text = Constants.ROOM_PRIVATE_PASSWORD_BAD_MSG;
+        }
+        else
+        {
+            privateRoomTextStatus.text = Constants.ROOM_FULL_MSG;
+        }
+    }
+
     public void UserNameErrorUI(ref UInt16 err)
     {
         if (err == Constants.USERNAME_BAD)
@@ -319,6 +357,16 @@ public class UIManager : MonoBehaviour
     public string GetRoomPassword()
     {
         return roomPassword.text;
+    }
+
+    public string GetPrivateRoomName()
+    {
+        return privateRoomNameInput.text;
+    }
+
+    public string GetPrivateRoomPassword()
+    {
+        return privateRoomPasswordInput.text;
     }
 
     public void ShowFindingPublicGamePanelUI()

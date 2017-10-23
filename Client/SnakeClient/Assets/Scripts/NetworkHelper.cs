@@ -174,6 +174,16 @@ public class NetworkHelper : MonoBehaviour
         uiManager.RoomCreationFailedUI(errorCode);
     }
 
+    public void roomPrivateJoinedSuccess()
+    {
+        uiManager.ShowErrorPanel("Success");
+    }
+
+    public void roomPrivateJoinedFailure(ref UInt16 errorCode)
+    {
+        uiManager.RoomPrivateErrorUI(errorCode);
+    }
+
     public void roomAbandonedCheck(ref UInt16 errorCode)
     {
         if(errorCode == Constants.ROOM_ABANDONED_SUCCESS)

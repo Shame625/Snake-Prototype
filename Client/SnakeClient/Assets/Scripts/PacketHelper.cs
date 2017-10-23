@@ -88,7 +88,7 @@ public class PacketHelper : MonoBehaviour
         byte[] room_type_bytes = new byte[2];
         room_type_bytes = BitConverter.GetBytes(roomType);
 
-        byte[] name_bytes = new byte[Constants.ROOM_NAME_LENGTH_MAX-2];
+        byte[] name_bytes = new byte[Constants.ROOM_NAME_LENGTH_MAX-1];
         byte[] pass_bytes;
 
         if (roomName.Length >= Constants.ROOM_NAME_LENGTH_MAX)
@@ -103,9 +103,6 @@ public class PacketHelper : MonoBehaviour
         name_bytes = Encoding.ASCII.GetBytes(roomName);
 
         Array.Copy(room_type_bytes, response, 2);
-
-
-
         Array.Copy(name_bytes, 0, response, 2, name_bytes.Length);
 
         if (pass_len > 0)
@@ -117,6 +114,32 @@ public class PacketHelper : MonoBehaviour
 
         UInt16 length = CalculateLength(ref response);
         FillHeader(ref msg, ref length, ref data);
+
+        Array.Copy(response, 0, data, 4, response.Length);
+        return data;
+    }
+
+    public byte[] JoinPrivateRoomToBytes(UInt16 message, string name, string password)
+    {
+        byte[] data = new byte[4 + (Constants.ROOM_NAME_LENGTH_MAX - 1) + password.Length];
+
+        byte[] response = new byte[((Constants.ROOM_NAME_LENGTH_MAX - 1) + password.Length)];
+        UInt16 length = CalculateLength(ref response);
+
+        FillHeader(ref message, ref length, ref data);
+
+        byte[] name_bytes = new byte[Constants.ROOM_NAME_LENGTH_MAX - 1];
+        byte[] pass_bytes;
+
+        name_bytes = Encoding.ASCII.GetBytes(name);
+        Array.Copy(name_bytes, 0, response,0, name_bytes.Length);
+
+        if (password.Length > 0)
+        {
+            pass_bytes = new byte[password.Length];
+            pass_bytes = Encoding.ASCII.GetBytes(password);
+            Array.Copy(pass_bytes, 0, response, (Constants.ROOM_NAME_LENGTH_MAX - 1), password.Length);
+        }
 
         Array.Copy(response, 0, data, 4, response.Length);
         return data;

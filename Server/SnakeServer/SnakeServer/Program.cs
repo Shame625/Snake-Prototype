@@ -39,7 +39,7 @@ namespace SnakeServer
             Console.WriteLine("---------------------------------------------------------\n");
             Console.WriteLine("---------------------------------------------------------");
             Console.WriteLine("Setting up server...");
-            _serverSocket.Bind(new IPEndPoint(IPAddress.Any, 100));
+            _serverSocket.Bind(new IPEndPoint(IPAddress.Any, 50000));
             _serverSocket.Listen(5);
             _serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
 
@@ -292,6 +292,48 @@ namespace SnakeServer
                         }
                         break;
 
+                    case Messages.ROOM_JOIN_PRIVATE_ROOM_REQUEST:
+                        {
+                            message_number_send = Messages.ROOM_JOIN_PRIVATE_ROOM_RESPONSE;
+                            UInt16 errorCode;
+
+                            if (_connectedClients[clientId]._isInRoom)
+                            {
+                                (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, Constants.ROOM_PRIVATE_JOIN_FAILURE);
+                            }
+                            else
+                            {
+                                RoomStruct room = new RoomStruct();
+                                //decode
+                                {
+                                    errorCode = Constants.ROOM_JOIN_SUCCESS;
+                                    (room, errorCode) = packetHelper.DecodeJoinPrivateRoom(ref data);
+                                    room.roomName = room.roomName.Trim('\0');
+                                    room.roomPassword = room.roomPassword.Trim('\0');
+                                    if (!_privateRooms.ContainsKey(room.roomName))
+                                        errorCode = Constants.ROOM_NAME_BAD;
+                                    else
+                                    {
+                                        if (_privateRooms[room.roomName]._roomPassword != room.roomPassword)
+                                            errorCode = Constants.ROOM_PASSWORD_BAD;
+                                        else if (!_privateRooms[room.roomName]._isEmpty)
+                                            errorCode = Constants.ROOM_FULL;
+                                    }
+
+                                }
+
+                                //send more data
+                                if(errorCode == Constants.ROOM_JOIN_SUCCESS)
+                                {
+                                    //generate nice big msg
+                                    SendDataJoinedRoom(_privateRooms[room.roomName], _connectedClients[clientId]);
+                                }
+                                else
+                                    (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, errorCode);
+                            }
+                        }
+                        break;
+
                     case Messages.ROOM_CANCEL_FINDING_REQUEST:
                         {
                             message_number_send = Messages.ROOM_CANCEL_FINDING_RESPONSE;
@@ -486,7 +528,6 @@ namespace SnakeServer
                 
                 if (roomRef != null)
                 {
-
                     Client clientRef = _connectedClients[_clientQueue[0]];
                     _clientQueue.RemoveAt(0);
 
