@@ -306,7 +306,7 @@ namespace SnakeServer
                                 RoomStruct room = new RoomStruct();
                                 //decode
                                 {
-                                    errorCode = Constants.ROOM_JOIN_SUCCESS;
+                                    errorCode = Constants.ROOM_PRIVATE_JOIN_SUCCESS;
                                     (room, errorCode) = packetHelper.DecodeJoinPrivateRoom(ref data);
                                     room.roomName = room.roomName.Trim('\0');
                                     room.roomPassword = room.roomPassword.Trim('\0');
@@ -323,10 +323,10 @@ namespace SnakeServer
                                 }
 
                                 //send more data
-                                if(errorCode == Constants.ROOM_JOIN_SUCCESS)
+                                if(errorCode == Constants.ROOM_PRIVATE_JOIN_SUCCESS)
                                 {
                                     //generate nice big msg
-                                    SendDataJoinedRoom(_privateRooms[room.roomName], _connectedClients[clientId]);
+                                    (lengthToSend, dataToSendTemp) = SendDataJoinedPrivateRoom(_privateRooms[room.roomName], _connectedClients[clientId]);
                                 }
                                 else
                                     (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, errorCode);
@@ -492,6 +492,30 @@ namespace SnakeServer
             catch { }
         }
 
+        public static (UInt16, byte[]) SendDataJoinedPrivateRoom(Room r, Client c)
+        {
+            byte[] dataToSendP1 = packetHelper.StringToBytes(Messages.ROOM_JOINED_MY_ROOM, c._userName);
+
+            byte[] dataToSendP2 = packetHelper.JoinedPrivateRoomDataToBytes(Messages.ROOM_JOIN_PRIVATE_ROOM_RESPONSE, Constants.ROOM_PRIVATE_JOIN_SUCCESS, r._roomName, r._roomAdmin._userName);
+
+            Console.WriteLine("Sending ROOM data to players!");
+            Console.WriteLine("Player 1" + r._roomAdmin._userName);
+            serverHelper.PrintSendingData(c._clientId, Messages.ROOM_JOINED_MY_ROOM, Convert.ToUInt16(dataToSendP1.Length), ref dataToSendP1);
+
+            //player 1
+            try
+            {
+                r._roomAdmin._socket.BeginSend(dataToSendP1, 0, dataToSendP1.Length, SocketFlags.None, new AsyncCallback(SendCallback), r._roomAdmin._socket);
+            }
+            catch { }
+
+            //player 2
+            c.EnteredRoom(ref r);
+            r.AddPlayer(ref c);
+
+            return (Convert.ToUInt16(dataToSendP2.Length), dataToSendP2);
+        }
+
         public static void SendDataRoomAbandoned(Socket s, int id)
         {
             byte[] dataToSend = new byte[Constants.MESSAGE_BASE];
@@ -506,8 +530,10 @@ namespace SnakeServer
             byte[] dataToSend = new byte[Constants.MESSAGE_BASE];
 
             packetHelper.FillHeaderBlankData(Messages.ROOM_PLAYER_LEFT_MY_ROOM, ref dataToSend);
-            if(_connectedClients.ContainsKey(id))
+            if (_connectedClients.ContainsKey(id))
+            {
                 _connectedClients[id]._socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), _connectedClients[id]._socket);
+            }
         }
 
         //Queue system

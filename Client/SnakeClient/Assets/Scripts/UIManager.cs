@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
     public GameObject packetHistory;
     public GameObject packetHistoryItemPrefab;
     public Scrollbar packetHistoryScrollbar;
+    public Text debugNameText;
 
     public GameObject connectionPanel;
     public GameObject mainPanel;
@@ -129,6 +130,7 @@ public class UIManager : MonoBehaviour
         HideDisplayFindPrivateGamePanelUI();
 
         userNameText.text = "Welcome " + gameManager.player._userName;
+        debugNameText.text = gameManager.player._userName;
     }
 
     public void DisplayVsPlayerPanelUI()
@@ -177,18 +179,24 @@ public class UIManager : MonoBehaviour
 
         player2LoadingBar.SetActive(true);
 
-        if(gameManager.currentRoom.roomType == Constants.ROOM_TYPE_PRIVATE)
+        bool isPrivate = false;
+
+        if (gameManager.currentRoom.roomType == Constants.ROOM_TYPE_PRIVATE)
+        {
             roomTitle.text = gameManager.enteredRoomName;
+            isPrivate = true;
+        }
         else
             roomTitle.text = "Public room";
 
-        DisplayRoomPanelUI();
+        DisplayRoomPanelUI(isPrivate);
     }
 
-    public void DisplayRoomPanelUI()
+    public void DisplayRoomPanelUI(bool isPrivate)
     {
         player1.text = gameManager.player._userName;
         player2.text = gameManager.opponent._userName;
+        player2LoadingBar.SetActive(false);
 
         if(gameManager.currentRoom.isAdmin)
         {
@@ -199,10 +207,20 @@ public class UIManager : MonoBehaviour
             AbandonButton.GetComponentInChildren<Text>().text = "Leave Room";
         }
 
+        if(isPrivate)
+        {
+            roomTitle.text = gameManager.currentRoom.roomName;
+        }
+        else
+        {
+            roomTitle.text = "Public Room";
+        }
+
         createRoomPanel.SetActive(false);
         inRoomPanel.SetActive(true);
         findGamePanel.SetActive(false);
         findingPublicGamePanel.SetActive(false);
+        HideDisplayFindPrivateGamePanelUI();
     }
 
     public void PlayerLeftMyRoomUI()
@@ -259,7 +277,12 @@ public class UIManager : MonoBehaviour
     {
         player2.text = gameManager.opponent._userName;
         player2LoadingBar.SetActive(false);
-        DisplayRoomPanelUI();
+
+        HideDisplayFindPrivateGamePanelUI();
+
+        bool isPrivate = (gameManager.currentRoom.roomType == Constants.ROOM_TYPE_PRIVATE ? true : false);
+
+        DisplayRoomPanelUI(isPrivate);
     }
 
     public void RoomPrivateErrorUI(UInt16 errorCode)

@@ -137,11 +137,6 @@ namespace SnakeServer
             }
         }
 
-        public void JoinPublicGame(Room r, Client c)
-        {
-
-        }
-
         private static bool CheckIfRoomNameInUse(ref string name, ref Dictionary<string, Room> dict)
         {
             if (dict.ContainsKey(name))

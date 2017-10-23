@@ -73,6 +73,23 @@ public class PacketHelper : MonoBehaviour
         return BitConverter.ToInt32(id_bytes, 0);
     }
 
+    public string BytesToJoinedPrivateRoomData(ref byte[] data, ref string opponentName)
+    {
+        //base + roomMax
+        int nameLen = data.Length - 17;
+        byte[] roomNameBytes = new byte[Constants.ROOM_NAME_LENGTH_MAX-1];
+        byte[] nameBytes = new byte[nameLen];
+
+        Array.Copy(data, 2, roomNameBytes, 0, Constants.ROOM_NAME_LENGTH_MAX - 1);
+        Array.Copy(data, (Constants.ROOM_NAME_LENGTH_MAX - 1) + 2, nameBytes, 0, nameLen);
+
+        opponentName = Encoding.ASCII.GetString(nameBytes);
+
+        Debug.Log(opponentName);
+
+        return Encoding.ASCII.GetString(roomNameBytes);
+    }
+
     public byte[] PrivateRoomToBytes(UInt16 msg, UInt16 roomType, string roomName, string roomPassword)
     {
         UInt16 pass_len = 0;

@@ -74,6 +74,7 @@ public class Functions : MonoBehaviour
     public void LeaveRoom()
     {
             byte[] dataToSend = new byte[4];
+            Debug.Log("Called leave room!");
             packetHelper.FillHeaderBlankData(Messages.ROOM_LEAVE_REQUEST, ref dataToSend);
             networkManager.SendPacket(ref dataToSend);
     }

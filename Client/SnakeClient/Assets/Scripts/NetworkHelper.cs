@@ -103,11 +103,12 @@ public class NetworkHelper : MonoBehaviour
     {
         gameManager.player._inRoom = true;
 
-        Room newRoom = new Room(true);
-        newRoom.roomId = gameManager.player._id;
-        newRoom.roomType = gameManager.enteredroomType;
+        gameManager.currentRoom.roomId = gameManager.player._id;
+        gameManager.currentRoom.roomType = gameManager.enteredroomType;
+        gameManager.currentRoom.isAdmin = true;
 
-        gameManager.SetRoom(ref newRoom);
+        if (gameManager.currentRoom.roomType == Constants.ROOM_TYPE_PRIVATE)
+            gameManager.currentRoom.roomName = gameManager.enteredRoomName;
 
         uiManager.RoomCreatedUI();
     }
@@ -139,8 +140,10 @@ public class NetworkHelper : MonoBehaviour
     {
         gameManager.opponent._userName = "";
         gameManager.currentRoom.roomId = 0;
+        gameManager.currentRoom.isAdmin = false;
         gameManager.player._inRoom = false;
         gameManager.player._findingRoom = false;
+        
 
         uiManager.ShowErrorPanel(Constants.ROOM_ABANDONED_MSG);
         uiManager.DisplayFindGamePanelUI();
@@ -174,9 +177,19 @@ public class NetworkHelper : MonoBehaviour
         uiManager.RoomCreationFailedUI(errorCode);
     }
 
-    public void roomPrivateJoinedSuccess()
+    public void roomPrivateJoinedSuccess(string roomName, string opponentName)
     {
-        uiManager.ShowErrorPanel("Success");
+        Debug.Log("joined private room");
+
+        gameManager.currentRoom.roomName = roomName;
+        gameManager.currentRoom.isAdmin = false;
+        gameManager.opponent._userName = opponentName;
+        gameManager.currentRoom.roomType = Constants.ROOM_TYPE_PRIVATE;
+
+        gameManager.player._findingRoom = false;
+        gameManager.player._inRoom = true;
+
+        uiManager.DisplayRoomPanelUI(true);
     }
 
     public void roomPrivateJoinedFailure(ref UInt16 errorCode)

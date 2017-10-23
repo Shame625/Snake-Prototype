@@ -161,6 +161,7 @@ namespace SnakeServer
 
         public byte[] JoinedRoomDataToBytes(UInt16 msg, int id, string userName)
         {
+            //base + int + string len
             byte[] data = new byte[8 + userName.Length];
             byte[] id_bytes = new byte[4];
 
@@ -171,6 +172,28 @@ namespace SnakeServer
 
             Array.Copy(id_bytes, 0, data, 4, id_bytes.Length);
             Array.Copy(string_bytes, 0, data, 8, string_bytes.Length);
+
+            return data;
+        }
+
+        public byte[] JoinedPrivateRoomDataToBytes(UInt16 msg, UInt16 errorMsg, string room_name, string userName)
+        {
+            UInt16 length = Convert.ToUInt16(6 + (Constants.ROOM_NAME_LENGTH_MAX - 1) + userName.Length);
+
+            byte[] data = new byte[length];
+            byte[] errorMsgBytes = new byte[2];
+            byte[] roomNameBytes = new byte[Constants.ROOM_NAME_LENGTH_MAX - 1];
+            byte[] userNameBytes;
+
+            errorMsgBytes = BitConverter.GetBytes(errorMsg);
+            roomNameBytes = Encoding.ASCII.GetBytes(room_name);
+            userNameBytes = Encoding.ASCII.GetBytes(userName);
+
+            FillHeader(ref msg, length, ref data);
+
+            Array.Copy(errorMsgBytes, 0, data, 4, 2);
+            Array.Copy(roomNameBytes, 0, data, 6, roomNameBytes.Length);
+            Array.Copy(userNameBytes, 0, data, (Constants.ROOM_NAME_LENGTH_MAX - 1) + Constants.MESSAGE_BASE + 2, userNameBytes.Length);
 
             return data;
         }

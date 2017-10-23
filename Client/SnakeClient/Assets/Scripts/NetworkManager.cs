@@ -254,14 +254,17 @@ public class NetworkManager : MonoBehaviour
                 case Messages.ROOM_JOIN_PRIVATE_ROOM_RESPONSE:
                     {
                         UInt16 server_response = packetHelper.BytesToUInt16(ref data);
-
+                        Debug.Log(server_response);
                         //Decoding
                         {
                             if (server_response == Constants.ROOM_PRIVATE_JOIN_SUCCESS)
                             {
+                                string opponentName = "";
+                                string roomName = packetHelper.BytesToJoinedPrivateRoomData(ref data, ref opponentName);
+
                                 UnityThreadHelper.Dispatcher.Dispatch(() =>
                                 {
-                                    networkHelper.roomPrivateJoinedSuccess();
+                                    networkHelper.roomPrivateJoinedSuccess(roomName, opponentName);
                                 });
                             }
                             else
