@@ -385,6 +385,23 @@ namespace SnakeServer
                         }
 
                     #endregion
+                    case Messages.ADMIN_LOGIN_REQUEST:
+                        {
+                            string password = Encoding.ASCII.GetString(data);
+                            
+                            if(password == Constants.ADMIN_LOGIN_PASSWORD)
+                            {
+                                (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(Messages.ADMIN_LOGIN_RESPONSE, Constants.ADMIN_LOGIN_SUCCESS);
+                            }
+                            else
+                            {
+                                (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(Messages.ADMIN_LOGIN_RESPONSE, Constants.ADMIN_LOGIN_FAILURE);
+                            }
+
+                            break;
+                        }
+                    #region ADMIN_STUFF
+#endregion
                     case Messages.BAD_PACKET:
                         {
                             lengthToSend = packetHelper.FillHeaderBlankData(Messages.BAD_PACKET, ref dataToSendTemp);

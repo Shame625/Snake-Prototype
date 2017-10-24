@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SnakeServer
+namespace Admin_Remote_Connect
 {
     public static class Constants
     {
@@ -26,7 +26,7 @@ namespace SnakeServer
         //User name constants
         public static UInt16 USERNAME_LENGTH_MIN { get { return 3; } }
         public static UInt16 USERNAME_LENGTH_MAX { get { return 16; } }
-        
+
         //User name Error codes
         public static UInt16 USERNAME_BAD { get { return 0x0000; } }
         public static UInt16 USERNAME_OK { get { return 0x0001; } }
@@ -37,7 +37,7 @@ namespace SnakeServer
         public static UInt16 ROOM_NAME_LENGTH_MAX { get { return 16; } }
         public static UInt16 ROOM_PASSWORD_LENGTH_MIN { get { return 3; } }
         public static UInt16 ROOM_PASSWORD_LENGTH_MAX { get { return 16; } }
-        
+
         public static UInt16 ROOM_TYPE_PUBLIC { get { return 0x0000; } }
         public static UInt16 ROOM_TYPE_PRIVATE { get { return 0x0001; } }
 
@@ -79,5 +79,10 @@ namespace SnakeServer
         public static UInt16 ADMIN_LOGIN_FAILURE { get { return 0x0000; } }
         public static UInt16 ADMIN_LOGIN_SUCCESS { get { return 0x0001; } }
 
+
+        //Admin Client Constants
+        public static string CLIENT_EXIT { get { return "exit"; } }
+        public static string CLIENT_CONNECT { get { return "connect"; } }
+        public static string CLIENT_LOGIN { get { return "login"; } }
     }
 }

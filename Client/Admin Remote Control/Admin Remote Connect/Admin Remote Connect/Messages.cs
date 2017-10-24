@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SnakeServer
+namespace Admin_Remote_Connect
 {
     public static class Messages
     {
@@ -27,8 +27,8 @@ namespace SnakeServer
         public const UInt16 ROOM_JOIN_PRIVATE_ROOM_REQUEST = 0xAA06;
         public const UInt16 ROOM_JOIN_PRIVATE_ROOM_RESPONSE = 0xAA07;
 
-        public const UInt16 ROOM_LEAVE_REQUEST = 0xAA08; 
-        public const UInt16 ROOM_LEAVE_RESPONSE = 0xAA09; 
+        public const UInt16 ROOM_LEAVE_REQUEST = 0xAA08;
+        public const UInt16 ROOM_LEAVE_RESPONSE = 0xAA09;
 
         public const UInt16 ROOM_CANCEL_FINDING_REQUEST = 0xAA0A;
         public const UInt16 ROOM_CANCEL_FINDING_RESPONSE = 0xAA0B;
