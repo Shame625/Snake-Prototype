@@ -16,6 +16,8 @@ namespace SnakeServer
         public bool _isInRoom { get; set; }
         public Room _currentRoom { get; set; }
 
+        public bool _isAdmin { get; set; }
+
         public Client(int id, Socket socket)
         {
             _clientId = id;
@@ -23,6 +25,7 @@ namespace SnakeServer
             _isAllowed = false;
             _isInRoom = false;
             _findingRoom = false;
+            _isAdmin = false;
         }
 
         public UInt16 SetName(ref string name)

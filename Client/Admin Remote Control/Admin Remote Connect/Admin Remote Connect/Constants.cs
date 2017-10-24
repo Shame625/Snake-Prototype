@@ -83,6 +83,9 @@ namespace Admin_Remote_Connect
         //Admin Client Constants
         public static string CLIENT_EXIT { get { return "exit"; } }
         public static string CLIENT_CONNECT { get { return "connect"; } }
+        public static string CLIENT_HELP { get { return "help"; } }
         public static string CLIENT_LOGIN { get { return "login"; } }
+        public static string CLIENT_DUMP_USERS_TO_FILE { get { return "dump_users"; } }
+        public static string CLIENT_DUMP_GAMES_TO_FILE { get { return "dump_games"; } }
     }
 }

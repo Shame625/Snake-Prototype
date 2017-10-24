@@ -7,7 +7,7 @@ namespace Admin_Remote_Connect
 {
     class Program
     {
-        private static readonly Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private static Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private static byte[] buffer = new byte[1024];
 
         static IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 50000);
@@ -21,7 +21,7 @@ namespace Admin_Remote_Connect
         private static void ConnectToServer()
         {
             int attempts = 0;
-
+            clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             while (!clientSocket.Connected)
             {
                 try
@@ -30,6 +30,7 @@ namespace Admin_Remote_Connect
                     Console.WriteLine("Connection attempt " + attempts);
                     // Change IPAddress.Loopback to a remote IP to connect to a remote host.
                     clientSocket.Connect(IPAddress.Loopback, 50000);
+                    clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveCallback, null);
                 }
                 catch (SocketException)
                 {
@@ -59,34 +60,68 @@ namespace Admin_Remote_Connect
 
 
             Console.WriteLine("Welcome to the Admin RC tool");
-            clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveCallback, null);
+            
 
-            while (input != Constants.CLIENT_EXIT)
-            {
-                input = Console.ReadLine();
-                string to_send = "";
-
-                if(input == Constants.CLIENT_LOGIN)
+                while (input != Constants.CLIENT_EXIT)
                 {
-                    Console.WriteLine("Enter password: ");
-                    to_send = Console.ReadLine();
+                    input = Console.ReadLine();
+                    string to_send = "";
 
-                    byte[] b = PacketHelper.LoginData(Messages.ADMIN_LOGIN_REQUEST, to_send);
-
-                    clientSocket.Send(b);
-                }
-
-                if(loggedIn)
+                if (clientSocket.Connected)
                 {
+                    if (input == Constants.CLIENT_LOGIN)
+                    {
+                        Console.WriteLine("Enter password: ");
+                        to_send = Console.ReadLine();
 
+                        byte[] b = PacketHelper.LoginData(Messages.ADMIN_LOGIN_REQUEST, to_send);
+
+                        clientSocket.Send(b);
+                    }
+                    else if (input == Constants.CLIENT_HELP)
+                    {
+                        ShowCommands();
+                    }
+
+                    if (loggedIn)
+                    {
+                        if (input == Constants.CLIENT_DUMP_USERS_TO_FILE)
+                        {
+                            Console.WriteLine("Dumping users to file.");
+                            byte[] b = new byte[4];
+
+                            PacketHelper.FillHeaderBlankData(Messages.ADMIN_DUMP_USERS_TO_FILE, ref b);
+
+                            clientSocket.Send(b);
+                        }
+
+                        else if(input == Constants.CLIENT_DUMP_GAMES_TO_FILE)
+                        {
+                            Console.WriteLine("Dumping games to file.");
+                            byte[] b = new byte[4];
+
+                            PacketHelper.FillHeaderBlankData(Messages.ADMIN_DUMP_GAMES_TO_FILE, ref b);
+
+                            clientSocket.Send(b);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("You must log in.");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("You must log in.");
-                }
-            }
-        }
+                    loggedIn = false;
 
+                    if (input == Constants.CLIENT_CONNECT)
+                        ConnectToServer();
+
+                    else if (input == Constants.CLIENT_EXIT)
+                        return;
+                }
+                }
+        }
 
         private static void ReceiveCallback(IAsyncResult AR)
         {
@@ -172,5 +207,17 @@ namespace Admin_Remote_Connect
             sb.Append(" }");
             return sb.ToString();
         }
+
+
+        private static void ShowCommands()
+        {
+            Console.WriteLine("Commands:");
+            Console.WriteLine(Constants.CLIENT_CONNECT);
+            Console.WriteLine(Constants.CLIENT_LOGIN);
+            Console.WriteLine(Constants.CLIENT_EXIT);
+            Console.WriteLine(Constants.CLIENT_DUMP_USERS_TO_FILE);
+            Console.WriteLine(Constants.CLIENT_DUMP_GAMES_TO_FILE);
+        }
+
     }
 }

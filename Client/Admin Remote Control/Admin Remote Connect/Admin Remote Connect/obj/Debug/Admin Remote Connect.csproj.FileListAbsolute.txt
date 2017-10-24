@@ -4,3 +4,4 @@ F:\repo\Async Server and Client\Snake-Prototype\Client\Admin Remote Control\Admi
 F:\repo\Async Server and Client\Snake-Prototype\Client\Admin Remote Control\Admin Remote Connect\Admin Remote Connect\obj\Debug\Admin Remote Connect.csproj.CoreCompileInputs.cache
 F:\repo\Async Server and Client\Snake-Prototype\Client\Admin Remote Control\Admin Remote Connect\Admin Remote Connect\obj\Debug\Admin Remote Connect.exe
 F:\repo\Async Server and Client\Snake-Prototype\Client\Admin Remote Control\Admin Remote Connect\Admin Remote Connect\obj\Debug\Admin Remote Connect.pdb
+F:\repo\Async Server and Client\Snake-Prototype\Client\Admin Remote Control\Admin Remote Connect\Admin Remote Connect\obj\Debug\Admin Remote Connect.csprojResolveAssemblyReference.cache

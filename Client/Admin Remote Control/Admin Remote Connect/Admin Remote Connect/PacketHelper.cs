@@ -36,6 +36,23 @@ namespace Admin_Remote_Connect
             data[3] = length_bytes[1];
         }
 
+        static public UInt16 FillHeaderBlankData(UInt16 messageNo, ref byte[] data)
+        {
+            byte[] message_bytes = new byte[2];
+            byte[] length_bytes = new byte[2];
+
+            message_bytes = BitConverter.GetBytes(messageNo);
+            length_bytes = BitConverter.GetBytes((UInt16)4);
+
+            data[0] = message_bytes[0];
+            data[1] = message_bytes[1];
+
+            data[2] = length_bytes[0];
+            data[3] = length_bytes[1];
+
+            return 4;
+        }
+
         public static void BytesToMessageLength(ref byte[] msg, ref byte[] len, ref UInt16 msgNo, ref UInt16 length)
         {
             msgNo = BitConverter.ToUInt16(msg, 0);

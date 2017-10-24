@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -51,6 +52,7 @@ namespace SnakeServer
             Console.WriteLine("---------------------------------------------------------");
 
             MapManager.LoadMaps();
+            ClearLogs();
 
             var startTimeSpan = TimeSpan.Zero;
             var periodTimeSpan = TimeSpan.FromMilliseconds(Constants.QUEUE_TIMER_TICK_MILISECONDS);
@@ -385,6 +387,7 @@ namespace SnakeServer
                         }
 
                     #endregion
+                    #region ADMIN_STUFF
                     case Messages.ADMIN_LOGIN_REQUEST:
                         {
                             string password = Encoding.ASCII.GetString(data);
@@ -392,6 +395,7 @@ namespace SnakeServer
                             if(password == Constants.ADMIN_LOGIN_PASSWORD)
                             {
                                 (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(Messages.ADMIN_LOGIN_RESPONSE, Constants.ADMIN_LOGIN_SUCCESS);
+                                _connectedClients[clientId]._isAdmin = true;
                             }
                             else
                             {
@@ -400,7 +404,39 @@ namespace SnakeServer
 
                             break;
                         }
-                    #region ADMIN_STUFF
+
+                    case Messages.ADMIN_DUMP_USERS_TO_FILE:
+                        {
+                            if (!_connectedClients[clientId]._isAdmin)
+                                break;
+
+                            Console.WriteLine("[ADMIN]Dump users to file.");
+
+                            using (StreamWriter file = new StreamWriter("connected_clients.txt"))
+                                foreach (var entry in _connectedClients)
+                                    file.WriteLine("[ ClientId: {0} User Name: {1} IP: {2} ]", entry.Key, entry.Value._userName, entry.Value._socket.RemoteEndPoint);
+
+                            break;
+                        }
+                    case Messages.ADMIN_DUMP_GAMES_TO_FILE:
+                        {
+                            if (!_connectedClients[clientId]._isAdmin)
+                                break;
+
+                            Console.WriteLine("[ADMIN]Dump games to file.");
+                            Console.WriteLine("Public game count: " + _publicRooms.Count);
+                            Console.WriteLine("Private game count: " + _privateRooms.Count);
+                            using (StreamWriter file = new StreamWriter("public_games.txt"))
+                                foreach (var entry in _publicRooms)
+                                    file.WriteLine("[ GameID: {0}\n Game Name: {1}]", entry.Key, entry.Value._roomName);
+
+                            using (StreamWriter file = new StreamWriter("private_games.txt"))
+                                foreach (var entry in _privateRooms)
+                                file.WriteLine("[ GameID: {0}\n Game Name: {1}]", entry.Key, entry.Value._roomName);
+
+                            break;
+                        }
+
 #endregion
                     case Messages.BAD_PACKET:
                         {
@@ -658,6 +694,24 @@ namespace SnakeServer
                         _usedNames.Remove(_connectedClients[socket.GetHashCode()]._userName);
                 }
                 _connectedClients.Remove(socket.GetHashCode());
+            }
+        }
+
+        private static void ClearLogs()
+        {
+            if (File.Exists("connected_clients.txt"))
+            {
+                File.Delete("connected_clients.txt");
+            }
+
+            if (File.Exists("public_games.txt"))
+            {
+                File.Delete("public_games.txt");
+            }
+
+            if (File.Exists("private_games.txt"))
+            {
+                File.Delete("private_games.txt");
             }
         }
     }
