@@ -7,6 +7,7 @@ namespace SnakeServer
     public class Game
     {
         Map _selectedMap;
+        UInt16 difficulty;
 
         public Game()
         {

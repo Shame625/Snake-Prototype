@@ -21,7 +21,7 @@ namespace SnakeServer
 
         public bool _isEmpty { get; set; }
 
-        Game game;
+        public Game game;
 
         public Room(Client c, UInt16 t, int id, string name, string password)
         {

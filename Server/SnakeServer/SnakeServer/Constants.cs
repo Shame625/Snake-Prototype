@@ -70,6 +70,15 @@ namespace SnakeServer
         public static UInt16 ROOM_CANCEL_FINDING_SUCCESS { get { return 0x0006; } }
         public static UInt16 ROOM_CANCEL_FINDING_FAILURE { get { return 0x0007; } }
 
+        public static UInt16 ROOM_DIFFICULTY_EASY { get { return 0x0000; } }
+        public static UInt16 ROOM_DIFFICULTY_NORMAL { get { return 0x0001; } }
+        public static UInt16 ROOM_DIFFICULTY_HARD { get { return 0x0002; } }
+
+        public static UInt16 ROOM_MAP_CHANGE_SUCCESS { get { return 0x0001; } }
+        public static UInt16 ROOM_MAP_CHANGE_FAILURE { get { return 0x0000; } }
+
+        public static UInt16 ROOM_DIFFICULTY_CHANGE_SUCCESS { get { return 0x0001; } }
+        public static UInt16 ROOM_DIFFICULTY_CHANGE_FAILURE { get { return 0x0000; } }
 
         //Chat system
         public static UInt16 CHAT_MSG_LENGTH_MAX { get { return 100; } }

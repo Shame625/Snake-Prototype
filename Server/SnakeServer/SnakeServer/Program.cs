@@ -592,6 +592,16 @@ namespace SnakeServer
             }
         }
 
+        public static void SendMapChangedData(ref Room r)
+        {
+
+        }
+
+        public static void SendDifficultyChangedData(ref Room r)
+        {
+
+        }
+
         //Queue system
         public static void QueueSystem()
         {

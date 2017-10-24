@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace SnakeServer
-{
-    public class Map
+﻿public class Map
     {
-        int _x;
-        int _y;
+        public int _x;
+        public int _y;
         public byte[,] _grid;
 
         public Map(int x, int y)
@@ -18,9 +11,9 @@ namespace SnakeServer
             _grid = new byte[x, y];
         }
 
-        public void PrintMap()
+        public string PrintMap()
         {
-            
+        string map = "";
             for (int y = 0; y < _y; y++)
             {
                 string temp = "";
@@ -28,7 +21,8 @@ namespace SnakeServer
                 {
                     temp += _grid[x,y];
                 }
+            map += temp + '\n';
             }
+        return map;
         }
     }
-}

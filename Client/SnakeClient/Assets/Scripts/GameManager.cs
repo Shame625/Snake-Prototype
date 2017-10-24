@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        MapManager.LoadMaps();
+
         Application.runInBackground = true;
         networkManager = GetComponent<NetworkManager>();
         networkHelper = GetComponent<NetworkHelper>();

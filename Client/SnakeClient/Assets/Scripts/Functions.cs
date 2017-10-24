@@ -113,6 +113,26 @@ public class Functions : MonoBehaviour
         networkManager.SendPacket(ref dataToSend);
     }
 
+    public void ChangeDifficulty(UInt16 difficulty)
+    {
+        if (gameManager.currentRoom.isAdmin)
+        {
+            byte[] dataToSend = new byte[6];
+            packetHelper.UInt16ToBytes(Messages.ROOM_CHANGE_DIFFICULTY_REQUEST, difficulty);
+            networkManager.SendPacket(ref dataToSend);
+        }
+    }
+
+    public void ChangeMap(UInt16 mapId)
+    {
+        if(gameManager.currentRoom.isAdmin)
+        {
+            byte[] dataToSend = new byte[6];
+            packetHelper.UInt16ToBytes(Messages.ROOM_CHANGE_MAP_REQUEST, mapId);
+            networkManager.SendPacket(ref dataToSend);
+        }
+    }
+
     public void Logout()
     {
         byte[] dataToSend = packetHelper.UInt16ToBytes(Messages.LOGOUT, Constants.LOGOUT_CODE);

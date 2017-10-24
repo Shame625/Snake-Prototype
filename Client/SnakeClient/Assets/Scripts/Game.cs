@@ -1,12 +1,10 @@
 ﻿using System;
 
-
 //Game Logic should go here
-namespace SnakeServer
-{
     public class Game
     {
         Map _selectedMap;
+        UInt16 _selectedDifficulty;    
 
         public Game()
         {
@@ -20,4 +18,3 @@ namespace SnakeServer
 
         }
     }
-}

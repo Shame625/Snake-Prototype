@@ -1,2 +1,0 @@
-[ ClientId: 12547953 User Name:  IP: 127.0.0.1:51093 ]
-[ ClientId: 41622463 User Name: d23d2d IP: 127.0.0.1:51094 ]

@@ -34,4 +34,10 @@ public static class Messages
     public const UInt16 ROOM_JOINED_MY_ROOM = 0xAA0D;
     public const UInt16 ROOM_PLAYER_LEFT_MY_ROOM = 0xAA0E;
     public const UInt16 ROOM_CLOSED = 0xAA0F;
+
+    public const UInt16 ROOM_CHANGE_DIFFICULTY_REQUEST = 0xAB00;
+    public const UInt16 ROOM_CHANGE_DIFFICULTY_RESPONSE = 0xAB01;
+
+    public const UInt16 ROOM_CHANGE_MAP_REQUEST = 0xAB02;
+    public const UInt16 ROOM_CHANGE_MAP_RESPONSE = 0xAB03;
 }

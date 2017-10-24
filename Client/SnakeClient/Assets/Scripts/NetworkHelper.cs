@@ -101,6 +101,8 @@ public class NetworkHelper : MonoBehaviour
 
     public void roomCreatedSuccessfull()
     {
+        MapManager.currentMapIndex = 0;
+
         gameManager.player._inRoom = true;
 
         gameManager.currentRoom.roomId = gameManager.player._id;

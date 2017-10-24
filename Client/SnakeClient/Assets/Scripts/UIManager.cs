@@ -49,10 +49,21 @@ public class UIManager : MonoBehaviour
     public GameObject player2LoadingBar;
     public Text roomTitle;
     public Button AbandonButton;
+    public GameObject mapButton;
+
+    public GameObject roomButtonLeft;
+    public GameObject roomButtonRight;
 
     //Error panel
     public GameObject errorPanel;
-    public Text errorPanelMessage; 
+    public Text errorPanelMessage;
+
+
+    //Map Colors
+    Color Air = Color.white;
+    Color Wall = Color.black;
+    Color Spawn = Color.green;
+
 
     private void Awake()
     {
@@ -174,6 +185,8 @@ public class UIManager : MonoBehaviour
 
     public void RoomCreatedUI()
     {
+        roomButtonLeft.SetActive(false);
+
         player1.text = gameManager.player._userName;
         player2.text = "";
 
@@ -189,6 +202,7 @@ public class UIManager : MonoBehaviour
         else
             roomTitle.text = "Public room";
 
+        SetSelectedMap(0);
         DisplayRoomPanelUI(isPrivate);
     }
 
@@ -364,6 +378,83 @@ public class UIManager : MonoBehaviour
         {
             ShowErrorPanel(Constants.ROOM_ABANDONED_FAILED_MSG);
         }
+    }
+
+    public void SelectMapLeftButtonUI()
+    {
+        roomButtonRight.SetActive(true);
+
+        if (MapManager.currentMapIndex > 0 )
+        {
+            MapManager.currentMapIndex--;
+
+            //Will be called from functions, jsut testing now
+            SetSelectedMap(MapManager.currentMapIndex);
+        }
+        if(MapManager.currentMapIndex == 0)
+        {
+            roomButtonLeft.SetActive(false);
+        }
+    }
+
+    public void SelectMapRightButtonUI()
+    {
+        roomButtonLeft.SetActive(true);
+
+        if(MapManager.currentMapIndex < MapManager._NumberOfMaps - 1)
+        {
+            MapManager.currentMapIndex++;
+
+            //Will be called from functions, jsut testing now
+            SetSelectedMap(MapManager.currentMapIndex);
+        }
+        if(MapManager.currentMapIndex == MapManager._NumberOfMaps - 1)
+        {
+            roomButtonRight.SetActive(false);
+        }
+    }
+
+    public void SetSelectedMap(int id)
+    {
+        Map map = MapManager._Maps[0];
+        try
+        {
+            map = MapManager._Maps[id];
+        }
+        catch
+        {
+            Debug.Log("Map does not exist");
+        }
+        DrawMapOnMapElement(ref map);
+        return;
+    }
+
+    void DrawMapOnMapElement(ref Map map)
+    {
+        RawImage image = mapButton.GetComponent<RawImage>();
+        mapButton.GetComponent<RectTransform>().sizeDelta = new Vector2(map._x, map._y);
+        Texture2D myTexture = new Texture2D(map._x, map._y);
+
+        myTexture.filterMode = FilterMode.Point;
+        for (int y = 0; y < myTexture.height; y++)
+        {
+            for (int x = 0; x < myTexture.width; x++)
+            {
+                Color color = ((x & y) != 0 ? Color.white : Color.gray);
+
+                if (map._grid[x, y] == (int)MapManager.MapObjects.AIR)
+                    myTexture.SetPixel(x, y, Air);
+
+                else if (map._grid[x, y] == (int)MapManager.MapObjects.WALL)
+                    myTexture.SetPixel(x, y, Wall);
+
+                else if (map._grid[x, y] == (int)MapManager.MapObjects.SPAWN_POINT)
+                    myTexture.SetPixel(x, y, Spawn);
+            }
+        }
+
+        myTexture.Apply();
+        image.texture = myTexture;
     }
 
     public UInt16 GetGameType()

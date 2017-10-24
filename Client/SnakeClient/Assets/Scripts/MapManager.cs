@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
-namespace SnakeServer
-{
     static class MapManager
     {
-        enum MapObjects
+        public enum MapObjects
         {
             AIR,
             WALL,
@@ -16,12 +14,13 @@ namespace SnakeServer
 
         public static int _NumberOfMaps;
         public static List<Map> _Maps = new List<Map>();
+        public static int currentMapIndex = 0;
 
-        public static void LoadMaps()
+    public static void LoadMaps()
         {
             //path of Maps.txt is in Debug/Files/Maps.txt
 
-            string mapString = File.ReadAllText("Files/Maps.txt");
+            string mapString = File.ReadAllText("Assets/Files/Maps.txt");
 
             string[] maps = mapString.Split('-');
 
@@ -63,6 +62,7 @@ namespace SnakeServer
                 }
 
                 _Maps.Add(newMap);
+            Debug.Log(newMap.PrintMap());
             }
         }
 
@@ -78,4 +78,3 @@ namespace SnakeServer
             return 0;
         }
     }
-}

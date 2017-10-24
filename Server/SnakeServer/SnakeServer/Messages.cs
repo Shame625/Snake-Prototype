@@ -39,8 +39,11 @@ namespace SnakeServer
         public const UInt16 ROOM_CLOSED = 0xAA0F;
 
         //Game realted messages but still tied to room
-        public const UInt16 ROOM_SET_MAP = 0xAA10;
-        public const UInt16 ROOM_SET_DIFFICULTY = 0xAA11;
+        public const UInt16 ROOM_CHANGE_DIFFICULTY_REQUEST = 0xAB00;
+        public const UInt16 ROOM_CHANGE_DIFFICULTY_RESPONSE = 0xAB01;
+
+        public const UInt16 ROOM_CHANGE_MAP_REQUEST = 0xAB02;
+        public const UInt16 ROOM_CHANGE_MAP_RESPONSE = 0xAB03;
 
         //Chat related packets
         public const UInt16 CHAT_SEND_GLOBAL_MESSAGE_REQUEST = 0xBB00;
