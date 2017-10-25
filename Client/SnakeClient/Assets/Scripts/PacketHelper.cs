@@ -59,14 +59,23 @@ public class PacketHelper : MonoBehaviour
         return data;
     }
 
-    public int BytesToJoinedRoomData(ref byte[] data, ref string opponentName)
+    public int BytesToJoinedRoomData(ref byte[] data, ref string opponentName, ref UInt16 mapId, ref UInt16 difficulty)
     {
-        int nameLen = data.Length - 4;
+        int nameLen = data.Length - 8;
         byte[] id_bytes = new byte[4];
+        byte[] mapId_bytes = new byte[2];
+        byte[] difficulty_bytes = new byte[2];
+
         byte[] name_bytes = new byte[nameLen];
 
         Array.Copy(data, 0, id_bytes, 0, 4);
-        Array.Copy(data, 4, name_bytes, 0, nameLen);
+        Array.Copy(data, 4, mapId_bytes, 0, 2);
+        Array.Copy(data, 6, difficulty_bytes, 0, 2);
+
+        Array.Copy(data, 8, name_bytes, 0, nameLen);
+
+        mapId = BytesToUInt16(ref mapId_bytes);
+        difficulty = BytesToUInt16(ref difficulty_bytes);
 
         opponentName = Encoding.ASCII.GetString(name_bytes);
 
@@ -164,7 +173,15 @@ public class PacketHelper : MonoBehaviour
 
     public UInt16 BytesToUInt16(ref byte[] data)
     {
-        return BitConverter.ToUInt16(data, 0);
+        try
+        {
+            return BitConverter.ToUInt16(data, 0);
+        }
+        catch
+        {
+
+        }
+        return 0x00;
     }
 
     public int BytesToInt(ref byte[] data)

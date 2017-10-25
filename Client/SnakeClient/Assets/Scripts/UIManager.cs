@@ -7,6 +7,7 @@ public class UIManager : MonoBehaviour
 {
     private NetworkManager networkManager;
     private GameManager gameManager;
+    Functions functions;
 
     //Debug crap
     public Text debugPacketRecieved;
@@ -54,6 +55,8 @@ public class UIManager : MonoBehaviour
     public GameObject roomButtonLeft;
     public GameObject roomButtonRight;
 
+    public Dropdown roomDifficultyDropDown;
+
     //Error panel
     public GameObject errorPanel;
     public Text errorPanelMessage;
@@ -69,8 +72,10 @@ public class UIManager : MonoBehaviour
     {
         networkManager = GetComponent<NetworkManager>();
         gameManager = GetComponent<GameManager>();
+        functions = GetComponent<Functions>();
 
         SetUpDropDownTypes();
+        SetUpDropDownDifficulties();
     }
 
     public void ConnectUI()
@@ -202,7 +207,7 @@ public class UIManager : MonoBehaviour
         else
             roomTitle.text = "Public room";
 
-        SetSelectedMap(0);
+        SetSelectedMapUI();
         DisplayRoomPanelUI(isPrivate);
     }
 
@@ -336,6 +341,17 @@ public class UIManager : MonoBehaviour
         roomTypeDropdown.value = 0;
     }
 
+    void SetUpDropDownDifficulties()
+    {
+        roomDifficultyDropDown.options.Clear();
+
+        roomDifficultyDropDown.options.Add(new Dropdown.OptionData("Easy"));
+        roomDifficultyDropDown.options.Add(new Dropdown.OptionData("Normal"));
+        roomDifficultyDropDown.options.Add(new Dropdown.OptionData("Hard"));
+
+        roomTypeDropdown.value = 0;
+    }
+
     public string GetNameFromInputField()
     {
         gameManager.enteredName = nameInputField.text;
@@ -384,14 +400,9 @@ public class UIManager : MonoBehaviour
     {
         roomButtonRight.SetActive(true);
 
-        if (MapManager.currentMapIndex > 0 )
-        {
-            MapManager.currentMapIndex--;
-
-            //Will be called from functions, jsut testing now
-            SetSelectedMap(MapManager.currentMapIndex);
-        }
-        if(MapManager.currentMapIndex == 0)
+        MapManager.ChangeMapIndex(false);
+        functions.ChangeMap();
+        if(MapManager.GetCurrentMapIndex() == 0)
         {
             roomButtonLeft.SetActive(false);
         }
@@ -401,31 +412,17 @@ public class UIManager : MonoBehaviour
     {
         roomButtonLeft.SetActive(true);
 
-        if(MapManager.currentMapIndex < MapManager._NumberOfMaps - 1)
-        {
-            MapManager.currentMapIndex++;
-
-            //Will be called from functions, jsut testing now
-            SetSelectedMap(MapManager.currentMapIndex);
-        }
-        if(MapManager.currentMapIndex == MapManager._NumberOfMaps - 1)
+        MapManager.ChangeMapIndex(true);
+        functions.ChangeMap();
+        if (MapManager.GetCurrentMapIndex() == MapManager._NumberOfMaps - 1)
         {
             roomButtonRight.SetActive(false);
         }
     }
 
-    public void SetSelectedMap(int id)
+    public void SetSelectedMapUI()
     {
-        Map map = MapManager._Maps[0];
-        try
-        {
-            map = MapManager._Maps[id];
-        }
-        catch
-        {
-            Debug.Log("Map does not exist");
-        }
-        DrawMapOnMapElement(ref map);
+        DrawMapOnMapElement(ref gameManager.currentRoom.game._selectedMap);
         return;
     }
 
@@ -440,8 +437,6 @@ public class UIManager : MonoBehaviour
         {
             for (int x = 0; x < myTexture.width; x++)
             {
-                Color color = ((x & y) != 0 ? Color.white : Color.gray);
-
                 if (map._grid[x, y] == (int)MapManager.MapObjects.AIR)
                     myTexture.SetPixel(x, y, Air);
 
@@ -455,6 +450,11 @@ public class UIManager : MonoBehaviour
 
         myTexture.Apply();
         image.texture = myTexture;
+    }
+
+    public void SetDifficultyUI(UInt16 id)
+    {
+        roomDifficultyDropDown.value = id;
     }
 
     public UInt16 GetGameType()
@@ -527,5 +527,30 @@ public class UIManager : MonoBehaviour
         statusTextConnection.text = "";
         userNameTextStatus.text = "";
         roomCreationStatus.text = "";
+
+        roomButtonLeft.SetActive(false);
+        roomButtonLeft.SetActive(true);
+        roomDifficultyDropDown.value = Constants.ROOM_DIFFICULTY_EASY;
+        SetSelectedMapUI();
+        roomDifficultyDropDown.interactable = true;
+    }
+
+    public void EnableElementsAdminUI()
+    {
+        roomButtonLeft.SetActive(true);
+        roomButtonRight.SetActive(true);
+        roomDifficultyDropDown.interactable = true;
+    }
+
+    public void DisableElementsNotAdminUI()
+    {
+        roomButtonLeft.SetActive(false);
+        roomButtonRight.SetActive(false);
+        roomDifficultyDropDown.interactable = false;
+    }
+
+    public UInt16 GetDifficultyValue()
+    {
+        return Convert.ToUInt16(roomDifficultyDropDown.value);
     }
 }

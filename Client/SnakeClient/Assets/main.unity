@@ -9699,7 +9699,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1782731609
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9944,6 +9944,7 @@ MonoBehaviour:
   mapButton: {fileID: 878478541}
   roomButtonLeft: {fileID: 1635956062}
   roomButtonRight: {fileID: 2021878132}
+  roomDifficultyDropDown: {fileID: 1940763165}
   errorPanel: {fileID: 1296799039}
   errorPanelMessage: {fileID: 2118792013}
 --- !u!114 &1802565992
@@ -10539,7 +10540,18 @@ MonoBehaviour:
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1802565993}
+        m_MethodName: ChangeDifficulty
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Dropdown+DropdownEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1940763166

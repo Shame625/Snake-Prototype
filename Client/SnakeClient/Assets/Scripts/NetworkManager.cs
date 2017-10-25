@@ -321,11 +321,14 @@ public class NetworkManager : MonoBehaviour
                     {
                         int room_id;
                         string opponentUserName = "";
-                        room_id = packetHelper.BytesToJoinedRoomData(ref data, ref opponentUserName);
+                        UInt16 map_id = 0;
+                        UInt16 difficulty = 0;
+
+                        room_id = packetHelper.BytesToJoinedRoomData(ref data, ref opponentUserName, ref map_id, ref difficulty);
 
                         UnityThreadHelper.Dispatcher.Dispatch(() =>
                         {
-                            networkHelper.joinedRoom(room_id, opponentUserName);
+                            networkHelper.joinedRoom(room_id, opponentUserName, map_id, difficulty);
                         });
 
                         break;
@@ -358,6 +361,63 @@ public class NetworkManager : MonoBehaviour
                         UnityThreadHelper.Dispatcher.Dispatch(() =>
                         {
                             networkHelper.playerLeftMyRoom();
+                        });
+                        break;
+                    }
+
+                case Messages.ROOM_CHANGE_MAP_RESPONSE:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+
+                        if (server_response == Constants.ROOM_MAP_CHANGE_SUCCESS)
+                        {
+                            UnityThreadHelper.Dispatcher.Dispatch(() =>
+                            {
+                                networkHelper.MapSetSuccess();
+                            });
+                        }
+                        else
+                        {
+                            UnityThreadHelper.Dispatcher.Dispatch(() =>
+                            {
+                                networkHelper.MapSetFail();
+                            });
+                        }
+
+                        break;
+                    }
+
+                case Messages.ROOM_CHANGE_DIFFICULTY_RESPONSE:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+
+                        if (server_response == Constants.ROOM_DIFFICULTY_CHANGE_FAILURE)
+                        {
+                            UnityThreadHelper.Dispatcher.Dispatch(() =>
+                            {
+                                networkHelper.DifficultySetFail();
+                            });
+                        }
+
+                        break;
+                    }
+
+                case Messages.ROOM_MAP_CHANGED:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.MapChanged(server_response);
+                        });
+                        break;
+                    }
+
+                case Messages.ROOM_DIFFICULTY_CHANGED:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.DifficultyChanged(server_response);
                         });
                         break;
                     }

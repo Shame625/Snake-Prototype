@@ -61,6 +61,7 @@ namespace SnakeServer
             {
                 QueueSystem();
             }, null, startTimeSpan, periodTimeSpan);
+
         }
 
         private static void AcceptCallback(IAsyncResult AR)
@@ -386,6 +387,58 @@ namespace SnakeServer
                             break;
                         }
 
+                    case Messages.ROOM_CHANGE_MAP_REQUEST:
+                        {
+                            UInt16 request = BitConverter.ToUInt16(data, 0);
+                            message_number_send = Messages.ROOM_CHANGE_MAP_RESPONSE;
+
+                            //checking if user is admin of a room
+                            if (_connectedClients[clientId]._currentRoom._roomAdmin._clientId == clientId)
+                            {
+                                if (request <= MapManager._NumberOfMaps - 1)
+                                {
+                                    (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, Constants.ROOM_MAP_CHANGE_SUCCESS);
+                                    _connectedClients[clientId]._currentRoom.game.SetMap(request);
+                                    SendMapChangedData(_connectedClients[clientId]._currentRoom);
+                                }
+                                else
+                                {
+                                    (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, Constants.ROOM_MAP_CHANGE_FAILURE);
+                                }
+                            }
+                            break;
+                        }
+
+                    case Messages.ROOM_CHANGE_DIFFICULTY_REQUEST:
+                        {
+                            UInt16 request = BitConverter.ToUInt16(data, 0);
+                            message_number_send = Messages.ROOM_CHANGE_DIFFICULTY_RESPONSE;
+
+                            //check if user requesting change is admin
+                            try
+                            {
+                                if (_connectedClients[clientId]._currentRoom._roomAdmin._clientId == clientId)
+                                {
+                                    if (request <= Constants.ROOM_DIFFICULTY_HARD)
+                                    {
+                                        _connectedClients[clientId]._currentRoom.game.SetDifficulty(request);
+                                        (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, Constants.ROOM_DIFFICULTY_CHANGE_SUCCESS);
+                                    }
+                                    else
+                                    {
+                                        _connectedClients[clientId]._currentRoom.game.SetDifficulty(Constants.ROOM_DIFFICULTY_EASY);
+                                        (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, Constants.ROOM_DIFFICULTY_CHANGE_FAILURE);
+                                    }
+                                    SendDifficultyChangedData(_connectedClients[clientId]._currentRoom);
+                                }
+                            }
+                            catch
+                            {
+                                Console.WriteLine("Welp, nice checking...");
+                            }
+                            break;
+                        }
+
                     #endregion
                     #region ADMIN_STUFF
                     case Messages.ADMIN_LOGIN_REQUEST:
@@ -524,13 +577,13 @@ namespace SnakeServer
         public static void SendDataJoinedRoom(Room r, Client c)
         {
             byte[] dataToSendP1 = packetHelper.StringToBytes(Messages.ROOM_JOINED_MY_ROOM , c._userName);
-            byte[] dataToSendP2 = packetHelper.JoinedRoomDataToBytes(Messages.ROOM_JOINED_PUBLIC_ROOM, r._roomId, r._roomAdmin._userName);
+            byte[] dataToSendP2 = packetHelper.JoinedRoomDataToBytes(Messages.ROOM_JOINED_PUBLIC_ROOM, r._roomId, r.game._mapId, r.game._difficulty, r._roomAdmin._userName);
 
             Console.WriteLine("Sending ROOM data to players!");
             Console.WriteLine("Player 1" + r._roomAdmin._userName);
             serverHelper.PrintSendingData(c._clientId, Messages.ROOM_JOINED_MY_ROOM, Convert.ToUInt16(dataToSendP1.Length), ref dataToSendP1);
             Console.WriteLine("Player 2" + c._userName);
-            serverHelper.PrintSendingData(c._clientId, Messages.ROOM_JOINED_MY_ROOM, Convert.ToUInt16(dataToSendP2.Length), ref dataToSendP2);
+            serverHelper.PrintSendingData(c._clientId, Messages.ROOM_JOINED_PUBLIC_ROOM, Convert.ToUInt16(dataToSendP2.Length), ref dataToSendP2);
             //player 1
             try
             {
@@ -592,14 +645,38 @@ namespace SnakeServer
             }
         }
 
-        public static void SendMapChangedData(ref Room r)
+        public static void SendMapChangedData(Room r)
         {
+            byte[] dataToSend = packetHelper.UInt16ToBytesNoLen(Messages.ROOM_MAP_CHANGED, r.game._mapId);
 
+            if(r.refClients[1] != null)
+            {
+                try
+                {
+                    r.refClients[1]._socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), r.refClients[1]._socket);
+                }
+                catch
+                {
+                    Console.WriteLine("Socket closed");
+                }
+            }
         }
 
-        public static void SendDifficultyChangedData(ref Room r)
+        public static void SendDifficultyChangedData(Room r)
         {
+            byte[] dataToSend = packetHelper.UInt16ToBytesNoLen(Messages.ROOM_DIFFICULTY_CHANGED, r.game._difficulty);
 
+            if (r.refClients[1] != null)
+            {
+                try
+                {
+                    r.refClients[1]._socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), r.refClients[1]._socket);
+                }
+                catch
+                {
+                    Console.WriteLine("Socket closed");
+                }
+            }
         }
 
         //Queue system

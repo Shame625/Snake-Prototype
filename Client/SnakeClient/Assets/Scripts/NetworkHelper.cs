@@ -101,7 +101,8 @@ public class NetworkHelper : MonoBehaviour
 
     public void roomCreatedSuccessfull()
     {
-        MapManager.currentMapIndex = 0;
+        MapManager.Reset();
+        gameManager.currentRoom.game.ClearGame();
 
         gameManager.player._inRoom = true;
 
@@ -112,13 +113,34 @@ public class NetworkHelper : MonoBehaviour
         if (gameManager.currentRoom.roomType == Constants.ROOM_TYPE_PRIVATE)
             gameManager.currentRoom.roomName = gameManager.enteredRoomName;
 
+        uiManager.EnableElementsAdminUI();
         uiManager.RoomCreatedUI();
+    }
+
+    public void MapSetSuccess()
+    {
+        gameManager.currentRoom.game.SetMap(MapManager.GetCurrentMapIndex());
+        uiManager.SetSelectedMapUI();
+    }
+
+    public void MapSetFail()
+    {
+        MapManager.FailedToChangeMap();
+        uiManager.ShowErrorPanel(Constants.ROOM_FAILED_SET_MAP_MSG);
+    }
+
+    public void MapChanged(UInt16 mapId)
+    {
+        gameManager.currentRoom.game.SetMap(mapId);
+        MapManager.MapChanged(mapId);
+        uiManager.SetSelectedMapUI();
     }
 
     public void playerJoinedMyRoom(string n)
     {
         gameManager.opponent._userName = n;
         uiManager.PlayerJoinedMyRoomUI();
+        uiManager.SetSelectedMapUI();
     }
 
     public void playerLeftMyRoom()
@@ -129,12 +151,20 @@ public class NetworkHelper : MonoBehaviour
         uiManager.PlayerLeftMyRoomUI();
     }
 
-    public void joinedRoom(int id, string name)
+    public void joinedRoom(int id, string name, UInt16 mapId, UInt16 difficulty)
     {
         gameManager.opponent._userName = name;
         gameManager.currentRoom.isAdmin = false;
         gameManager.player._findingRoom = false;
         gameManager.player._inRoom = true;
+
+        MapManager.MapChanged(mapId);
+        gameManager.currentRoom.game.SetMap(mapId);
+
+        uiManager.DisableElementsNotAdminUI();
+        uiManager.SetSelectedMapUI();
+        uiManager.SetDifficultyUI(difficulty);
+
         uiManager.JoinedRoomUI();
     }
 
@@ -145,8 +175,11 @@ public class NetworkHelper : MonoBehaviour
         gameManager.currentRoom.isAdmin = false;
         gameManager.player._inRoom = false;
         gameManager.player._findingRoom = false;
-        
 
+        MapManager.Reset();
+        gameManager.currentRoom.game.ClearGame();
+
+        uiManager.ClearUI();
         uiManager.ShowErrorPanel(Constants.ROOM_ABANDONED_MSG);
         uiManager.DisplayFindGamePanelUI();
     }
@@ -189,6 +222,7 @@ public class NetworkHelper : MonoBehaviour
         gameManager.player._findingRoom = false;
         gameManager.player._inRoom = true;
 
+        uiManager.DisableElementsNotAdminUI();
         uiManager.DisplayRoomPanelUI(true);
     }
 
@@ -203,6 +237,9 @@ public class NetworkHelper : MonoBehaviour
         {
             gameManager.currentRoom.roomId = 0;
             gameManager.player._inRoom = false;
+
+            MapManager.Reset();
+            gameManager.currentRoom.game.ClearGame();
         }
         uiManager.AbandonRoomUI(errorCode);
     }
@@ -210,13 +247,31 @@ public class NetworkHelper : MonoBehaviour
     public void leaveRoomSuccessful()
     {
         gameManager.player._inRoom = false;
+
+        gameManager.currentRoom.game.ClearGame();
+        MapManager.Reset();
+
         uiManager.ShowErrorPanel(Constants.ROOM_LEAVE_SUCCESS_MSG);
+        uiManager.ClearUI();
         uiManager.DisplayVsPlayerPanelUI();
     }
 
     public void leaveRoomFailed()
     {
         uiManager.ShowErrorPanel(Constants.ROOM_LEAVE_FAILED_MSG);
+    }
+
+    public void DifficultyChanged(UInt16 id)
+    {
+        gameManager.currentRoom.game._difficulty = id;
+        uiManager.SetDifficultyUI(id);
+    }
+
+    public void DifficultySetFail()
+    {
+        gameManager.currentRoom.game._difficulty = Constants.ROOM_DIFFICULTY_EASY;
+        uiManager.SetDifficultyUI(Constants.ROOM_DIFFICULTY_EASY);
+        uiManager.ShowErrorPanel(Constants.ROOM_FAILED_SET_DIFFICULTY_MSG);
     }
 
     public string PrintBytes(ref byte[] byteArray)

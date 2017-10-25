@@ -100,4 +100,6 @@ class Constants
     public static string ROOM_PRIVATE_NAME_BAD_MSG { get { return "Room does not exist!"; } }
     public static string ROOM_PRIVATE_PASSWORD_BAD_MSG { get { return "Wrong password!"; } }
     public static string ROOM_FULL_MSG { get { return "Room is full!"; } }
+    public static string ROOM_FAILED_SET_MAP_MSG { get { return "Failed to set map!"; } }
+    public static string ROOM_FAILED_SET_DIFFICULTY_MSG { get { return "Failed to set difficulty!"; } }
 }

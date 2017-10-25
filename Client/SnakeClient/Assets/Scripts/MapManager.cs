@@ -14,15 +14,18 @@ using UnityEngine;
 
         public static int _NumberOfMaps;
         public static List<Map> _Maps = new List<Map>();
-        public static int currentMapIndex = 0;
+        static int previousMapIndex = 0;
+        static int currentMapIndex = 0;
 
     public static void LoadMaps()
         {
-            //path of Maps.txt is in Debug/Files/Maps.txt
+        //path of Maps.txt is in Debug/Files/Maps.txt
 
-            string mapString = File.ReadAllText("Assets/Files/Maps.txt");
+        //string mapString = File.ReadAllText("Assets/Files/Maps.txt");
 
-            string[] maps = mapString.Split('-');
+        TextAsset mapS = Resources.Load("Files/Maps") as TextAsset;
+        Debug.Log(mapS);
+            string[] maps = mapS.text.Split('-');
 
             //Keeping track of map number for error checking later
             _NumberOfMaps = maps.Length;
@@ -77,4 +80,48 @@ using UnityEngine;
 
             return 0;
         }
+
+    public static void Reset()
+    {
+        currentMapIndex = 0;
+        previousMapIndex = 0;
     }
+
+    public static int GetCurrentMapIndex()
+    {
+        return currentMapIndex;
+    }
+
+    public static int ChangeMapIndex(bool side)
+    {
+        if(!side)
+        {
+            if (currentMapIndex > 0)
+            {
+                previousMapIndex = currentMapIndex;
+                currentMapIndex--;
+            }
+        }
+        else
+        {
+            if (currentMapIndex < _NumberOfMaps - 1)
+            {
+                previousMapIndex = currentMapIndex;
+                currentMapIndex++;
+            }
+        }
+        
+        return currentMapIndex;
+    }
+
+    public static void MapChanged(int id)
+    {
+        previousMapIndex = id;
+        currentMapIndex = id;
+    }
+
+    public static void FailedToChangeMap()
+    {
+        currentMapIndex = previousMapIndex;
+    }
+}

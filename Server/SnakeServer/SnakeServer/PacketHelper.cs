@@ -159,19 +159,26 @@ namespace SnakeServer
             return (length, data);
         }
 
-        public byte[] JoinedRoomDataToBytes(UInt16 msg, int id, string userName)
+        public byte[] JoinedRoomDataToBytes(UInt16 msg, int id, UInt16 map_id, UInt16 difficulty, string userName)
         {
-            //base + int + string len
-            byte[] data = new byte[8 + userName.Length];
+            //base + int + UInt16 + UInt16 + string len
+            byte[] data = new byte[12 + userName.Length];
             byte[] id_bytes = new byte[4];
+            byte[] mapId_bytes = new byte[2];
+            byte[] difficulty_bytes = new byte[2];
 
             byte[] string_bytes = Encoding.ASCII.GetBytes(userName);
             id_bytes = BitConverter.GetBytes(id);
-            UInt16 length = Convert.ToUInt16(Constants.MESSAGE_BASE + id_bytes.Length + string_bytes.Length);
+            mapId_bytes = BitConverter.GetBytes(map_id);
+            difficulty_bytes = BitConverter.GetBytes(difficulty);
+
+            UInt16 length = Convert.ToUInt16(Constants.MESSAGE_BASE + id_bytes.Length + mapId_bytes.Length + mapId_bytes.Length + string_bytes.Length);
             FillHeader(ref msg, length, ref data);
 
             Array.Copy(id_bytes, 0, data, 4, id_bytes.Length);
-            Array.Copy(string_bytes, 0, data, 8, string_bytes.Length);
+            Array.Copy(mapId_bytes, 0, data, 8, mapId_bytes.Length);
+            Array.Copy(difficulty_bytes, 0, data, 10, difficulty_bytes.Length);
+            Array.Copy(string_bytes, 0, data, 12, string_bytes.Length);
 
             return data;
         }
