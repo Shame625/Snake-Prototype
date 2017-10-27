@@ -40,6 +40,7 @@ namespace SnakeServer
             Console.WriteLine("---------------------------------------------------------\n");
             Console.WriteLine("---------------------------------------------------------");
             Console.WriteLine("Setting up server...");
+
             _serverSocket.Bind(new IPEndPoint(IPAddress.Any, 50000));
             _serverSocket.Listen(5);
             _serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
@@ -54,10 +55,10 @@ namespace SnakeServer
             MapManager.LoadMaps();
             ClearLogs();
 
-            var startTimeSpan = TimeSpan.Zero;
-            var periodTimeSpan = TimeSpan.FromMilliseconds(Constants.QUEUE_TIMER_TICK_MILISECONDS);
+            TimeSpan startTimeSpan = TimeSpan.Zero;
+            TimeSpan periodTimeSpan = TimeSpan.FromMilliseconds(Constants.QUEUE_TIMER_TICK_MILISECONDS);
 
-            var timer = new System.Threading.Timer((e) =>
+           System.Threading.Timer timer = new System.Threading.Timer((e) =>
             {
                 QueueSystem();
             }, null, startTimeSpan, periodTimeSpan);
@@ -422,6 +423,7 @@ namespace SnakeServer
                                     if (request <= Constants.ROOM_DIFFICULTY_HARD)
                                     {
                                         _connectedClients[clientId]._currentRoom.game.SetDifficulty(request);
+                                        _connectedClients[clientId]._currentRoom.StartGame();
                                         (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, Constants.ROOM_DIFFICULTY_CHANGE_SUCCESS);
                                     }
                                     else
@@ -605,7 +607,7 @@ namespace SnakeServer
         {
             byte[] dataToSendP1 = packetHelper.StringToBytes(Messages.ROOM_JOINED_MY_ROOM, c._userName);
 
-            byte[] dataToSendP2 = packetHelper.JoinedPrivateRoomDataToBytes(Messages.ROOM_JOIN_PRIVATE_ROOM_RESPONSE, Constants.ROOM_PRIVATE_JOIN_SUCCESS, r._roomName, r._roomAdmin._userName);
+            byte[] dataToSendP2 = packetHelper.JoinedPrivateRoomDataToBytes(Messages.ROOM_JOIN_PRIVATE_ROOM_RESPONSE, Constants.ROOM_PRIVATE_JOIN_SUCCESS, r.game._mapId, r.game._difficulty, r._roomName, r._roomAdmin._userName);
 
             Console.WriteLine("Sending ROOM data to players!");
             Console.WriteLine("Player 1" + r._roomAdmin._userName);
@@ -665,7 +667,7 @@ namespace SnakeServer
         public static void SendDifficultyChangedData(Room r)
         {
             byte[] dataToSend = packetHelper.UInt16ToBytesNoLen(Messages.ROOM_DIFFICULTY_CHANGED, r.game._difficulty);
-
+            
             if (r.refClients[1] != null)
             {
                 try
@@ -683,7 +685,7 @@ namespace SnakeServer
         public static void QueueSystem()
         {
             //Console.WriteLine("Dumping Queue Number of people waiting: " + _clientQueue.Count + " Number of public rooms: " + _publicRooms.Count);
-            if (_clientQueue.Count != 0)
+            if (_clientQueue.Count > 0)
             {
                 Room roomRef = null;
                 foreach (KeyValuePair<int, Room> entry in _publicRooms)
@@ -694,7 +696,7 @@ namespace SnakeServer
                         break;
                     }
                 }
-                
+
                 if (roomRef != null)
                 {
                     Client clientRef = _connectedClients[_clientQueue[0]];

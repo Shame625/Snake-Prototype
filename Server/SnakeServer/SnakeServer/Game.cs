@@ -9,7 +9,6 @@ namespace SnakeServer
         Map _selectedMap;
         public UInt16 _difficulty;
         public UInt16 _mapId;
- 
 
         public Game()
         {
@@ -29,5 +28,6 @@ namespace SnakeServer
         {
             _difficulty = difficulty;
         }
+
     }
 }

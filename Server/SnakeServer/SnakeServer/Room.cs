@@ -23,12 +23,15 @@ namespace SnakeServer
 
         public Game game;
 
+        System.Threading.Timer gameLoopTimer;
+
         public Room(Client c, UInt16 t, int id, string name, string password)
         {
             _type = t;
             _roomId = id;
             _roomAdmin = c;
             _isEmpty = true;
+            refClients[0] = c;
 
             game = new Game();
 
@@ -45,6 +48,7 @@ namespace SnakeServer
             _roomId = id;
             _roomAdmin = c;
             _isEmpty = true;
+            refClients[0] = c;
 
             game = new Game();
         }
@@ -69,17 +73,26 @@ namespace SnakeServer
 
         public void StartGame()
         {
+            Console.WriteLine("Game started");
 
+            TimeSpan startTimeSpan = TimeSpan.Zero;
+            TimeSpan periodTimeSpan = TimeSpan.FromMilliseconds(100);
+
+            gameLoopTimer = new System.Threading.Timer((e) =>
+            {
+                GameLoop();
+            }, null, startTimeSpan, periodTimeSpan);
         }
 
-        void EndGame()
+        public void EndGame()
         {
-
+            Console.WriteLine("Game ended");
+            gameLoopTimer.Dispose();
         }
 
-        public void DestroyGame()
+        void GameLoop()
         {
-
+            Program.SendDataJoinedRoom(this, refClients[0]);
         }
 
     }

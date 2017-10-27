@@ -183,24 +183,33 @@ namespace SnakeServer
             return data;
         }
 
-        public byte[] JoinedPrivateRoomDataToBytes(UInt16 msg, UInt16 errorMsg, string room_name, string userName)
+        public byte[] JoinedPrivateRoomDataToBytes(UInt16 msg, UInt16 errorMsg, UInt16 map_id, UInt16 difficulty, string room_name, string userName)
         {
-            UInt16 length = Convert.ToUInt16(6 + (Constants.ROOM_NAME_LENGTH_MAX - 1) + userName.Length);
+            //UInt16 + UInt16 + UInt16 + UInt16 + UInt16 + str + str
+            UInt16 length = Convert.ToUInt16(10 + (Constants.ROOM_NAME_LENGTH_MAX - 1) + userName.Length);
 
             byte[] data = new byte[length];
             byte[] errorMsgBytes = new byte[2];
+
+            byte[] mapId_bytes = new byte[2];
+            byte[] difficulty_bytes = new byte[2];
+
             byte[] roomNameBytes = new byte[Constants.ROOM_NAME_LENGTH_MAX - 1];
             byte[] userNameBytes;
 
             errorMsgBytes = BitConverter.GetBytes(errorMsg);
+            mapId_bytes = BitConverter.GetBytes(map_id);
+            difficulty_bytes = BitConverter.GetBytes(difficulty);
             roomNameBytes = Encoding.ASCII.GetBytes(room_name);
             userNameBytes = Encoding.ASCII.GetBytes(userName);
 
             FillHeader(ref msg, length, ref data);
 
-            Array.Copy(errorMsgBytes, 0, data, 4, 2);
-            Array.Copy(roomNameBytes, 0, data, 6, roomNameBytes.Length);
-            Array.Copy(userNameBytes, 0, data, (Constants.ROOM_NAME_LENGTH_MAX - 1) + Constants.MESSAGE_BASE + 2, userNameBytes.Length);
+            Array.Copy(errorMsgBytes, 0, data, 4, errorMsgBytes.Length);
+            Array.Copy(mapId_bytes, 0, data, 6, mapId_bytes.Length);
+            Array.Copy(difficulty_bytes, 0, data, 8, difficulty_bytes.Length);
+            Array.Copy(roomNameBytes, 0, data, 10, roomNameBytes.Length);
+            Array.Copy(userNameBytes, 0, data, (Constants.ROOM_NAME_LENGTH_MAX - 1) + Constants.MESSAGE_BASE + 6, userNameBytes.Length);
 
             return data;
         }

@@ -82,17 +82,25 @@ public class PacketHelper : MonoBehaviour
         return BitConverter.ToInt32(id_bytes, 0);
     }
 
-    public string BytesToJoinedPrivateRoomData(ref byte[] data, ref string opponentName)
+    public string BytesToJoinedPrivateRoomData(ref byte[] data, ref string opponentName, ref UInt16 mapId, ref UInt16 difficulty)
     {
         //base + roomMax
-        int nameLen = data.Length - 17;
+        int nameLen = data.Length - 21;
+
         byte[] roomNameBytes = new byte[Constants.ROOM_NAME_LENGTH_MAX-1];
         byte[] nameBytes = new byte[nameLen];
+        byte[] mapId_bytes = new byte[2];
+        byte[] difficulty_bytes = new byte[2];
 
-        Array.Copy(data, 2, roomNameBytes, 0, Constants.ROOM_NAME_LENGTH_MAX - 1);
-        Array.Copy(data, (Constants.ROOM_NAME_LENGTH_MAX - 1) + 2, nameBytes, 0, nameLen);
+        Array.Copy(data, 2, mapId_bytes, 0, 2);
+        Array.Copy(data, 4, difficulty_bytes, 0, 2);
+
+        Array.Copy(data, 6, roomNameBytes, 0, Constants.ROOM_NAME_LENGTH_MAX - 1);
+        Array.Copy(data, (Constants.ROOM_NAME_LENGTH_MAX - 1) + 6, nameBytes, 0, nameLen);
 
         opponentName = Encoding.ASCII.GetString(nameBytes);
+        mapId = BitConverter.ToUInt16(mapId_bytes, 0);
+        difficulty = BitConverter.ToUInt16(difficulty_bytes, 0);
 
         Debug.Log(opponentName);
 

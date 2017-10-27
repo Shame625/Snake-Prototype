@@ -260,11 +260,14 @@ public class NetworkManager : MonoBehaviour
                             if (server_response == Constants.ROOM_PRIVATE_JOIN_SUCCESS)
                             {
                                 string opponentName = "";
-                                string roomName = packetHelper.BytesToJoinedPrivateRoomData(ref data, ref opponentName);
+                                UInt16 map_id = 0;
+                                UInt16 difficulty = Constants.ROOM_DIFFICULTY_EASY;
+
+                                string roomName = packetHelper.BytesToJoinedPrivateRoomData(ref data, ref opponentName, ref map_id, ref difficulty);
 
                                 UnityThreadHelper.Dispatcher.Dispatch(() =>
                                 {
-                                    networkHelper.roomPrivateJoinedSuccess(roomName, opponentName);
+                                    networkHelper.roomPrivateJoinedSuccess(roomName, opponentName, map_id, difficulty);
                                 });
                             }
                             else
@@ -322,7 +325,7 @@ public class NetworkManager : MonoBehaviour
                         int room_id;
                         string opponentUserName = "";
                         UInt16 map_id = 0;
-                        UInt16 difficulty = 0;
+                        UInt16 difficulty = Constants.ROOM_DIFFICULTY_EASY;
 
                         room_id = packetHelper.BytesToJoinedRoomData(ref data, ref opponentUserName, ref map_id, ref difficulty);
 

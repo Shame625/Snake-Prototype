@@ -21,6 +21,7 @@
 
         public void ClearGame()
         {
+             MapManager.Reset();
             _selectedMap = MapManager._Maps[0];
             _difficulty = Constants.ROOM_DIFFICULTY_EASY;
         }
