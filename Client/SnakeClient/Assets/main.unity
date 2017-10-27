@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657868, g: 0.4964127, b: 0.57481724, a: 1}
+  m_IndirectSpecularColor: {r: 0.43975607, g: 0.48817962, b: 0.56839895, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -3042,8 +3042,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 7
   m_Type: 1
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
+  m_Color: {r: 0.9904322, g: 0.99264705, b: 0.8320718, a: 1}
+  m_Intensity: 0.37
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -3064,7 +3064,7 @@ Light:
     m_Bits: 4294967295
   m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
+  m_BounceIntensity: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &653287420
@@ -3073,13 +3073,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 653287418}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.5299155, y: 0.31347594, z: -0.21949817, w: 0.7567979}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 70, y: 45, z: 0}
 --- !u!1 &659929074
 GameObject:
   m_ObjectHideFlags: 0
@@ -7120,7 +7120,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 50
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -7143,7 +7143,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1275839949}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 15, z: -10}
+  m_LocalPosition: {x: 0, y: 19, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -10069,11 +10069,15 @@ MonoBehaviour:
   enteredroomType: 0
   enteredRoomName: 
   MapParent: {fileID: 74650755}
-  PlayerPrefab: {fileID: 1042899244866666, guid: 96bc7ffc55a48884ba92eef72c78ce00,
+  PlayerPrefab: {fileID: 1401919044836588, guid: e54d04082f4c2f74c8f07957cdc78416,
     type: 2}
   FloorTile: {fileID: 1411779221502684, guid: 6bc07d70c0903d54b8a8078484a41bb1, type: 2}
+  FloorTileTransparent: {fileID: 1696234140306948, guid: 538b8ee1ae6fa2148bc96fe2a29e7edc,
+    type: 2}
   MapWallPrefab: {fileID: 1401919044836588, guid: e54d04082f4c2f74c8f07957cdc78416,
     type: 2}
+  playerWallTexture: {fileID: 2800000, guid: cf0b7ef4a651ca44fb25b3e1eb9e3ce6, type: 3}
+  enemyWallTexture: {fileID: 2800000, guid: 582aa8e2d99591a42a70cae93e9bb1f3, type: 3}
 --- !u!114 &1802565991
 MonoBehaviour:
   m_ObjectHideFlags: 0

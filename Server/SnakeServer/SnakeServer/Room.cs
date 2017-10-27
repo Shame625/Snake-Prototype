@@ -67,10 +67,9 @@ namespace SnakeServer
             if(refClients[1] != null)
             {
                 refClients[1] = null;
-                game._gameInProgress = false;
             }
             _isEmpty = true;
-
+            game._gameInProgress = false;
             StopGameStart();
         }
 
