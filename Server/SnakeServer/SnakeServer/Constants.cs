@@ -90,7 +90,6 @@ namespace SnakeServer
         public static UInt16 ROOM_GAME_STARTED_SUCCESS { get { return 0x0001; } }
         public static UInt16 ROOM_GAME_STARTED_FAILURE { get { return 0x0000; } }
 
-
         //Chat system
         public static UInt16 CHAT_MSG_LENGTH_MAX { get { return 100; } }
 

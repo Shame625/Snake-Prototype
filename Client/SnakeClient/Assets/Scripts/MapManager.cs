@@ -5,8 +5,7 @@ using System.Linq;
 using UnityEngine;
 
 
-
-static class MapManager
+public static class MapManager
     {
     public class Position
     {
@@ -73,6 +72,10 @@ static class MapManager
                         if (char.IsNumber(c))
                         {
                             newMap._grid[X, Y] = ReturnMapObject(c - '0');
+
+                        if (ReturnMapObject(c - '0') == (int)MapObjects.SPAWN_POINT)
+                            newMap.SetSpawnPoint((byte)X, (byte)Y);
+
                             X++;
                         }
                     }
@@ -80,7 +83,6 @@ static class MapManager
                 }
 
                 _Maps.Add(newMap);
-            Debug.Log(newMap.PrintMap());
             }
         }
 

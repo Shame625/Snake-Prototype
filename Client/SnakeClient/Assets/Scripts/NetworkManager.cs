@@ -441,6 +441,19 @@ public class NetworkManager : MonoBehaviour
                         });
                         break;
                     }
+                case Messages.ROOM_GAME_START_RESPONSE:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+
+                        if(server_response != Constants.ROOM_GAME_STARTED_SUCCESS)
+                        {
+                            UnityThreadHelper.Dispatcher.Dispatch(() =>
+                            {
+                                networkHelper.GameFailedToStart();
+                            });
+                        }
+                        break;
+                    }
 
                 case Messages.ROOM_CLOSED:
                     {

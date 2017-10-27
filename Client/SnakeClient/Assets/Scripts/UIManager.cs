@@ -58,6 +58,7 @@ public class UIManager : MonoBehaviour
 
     public GameObject roomButtonLeft;
     public GameObject roomButtonRight;
+    public GameObject startButton;
 
     public Dropdown roomDifficultyDropDown;
 
@@ -198,6 +199,7 @@ public class UIManager : MonoBehaviour
     public void RoomCreatedUI()
     {
         roomButtonLeft.SetActive(false);
+        startButton.SetActive(false);
 
         player1.text = gameManager.player._userName;
         player2.text = "";
@@ -209,6 +211,7 @@ public class UIManager : MonoBehaviour
         if (gameManager.currentRoom.roomType == Constants.ROOM_TYPE_PRIVATE)
         {
             roomTitle.text = gameManager.enteredRoomName;
+            startButton.SetActive(true);
             isPrivate = true;
         }
         else
@@ -224,7 +227,7 @@ public class UIManager : MonoBehaviour
         player2.text = gameManager.opponent._userName;
         player2LoadingBar.SetActive(false);
 
-        if(gameManager.currentRoom.isAdmin)
+        if (gameManager.currentRoom.isAdmin)
         {
             AbandonButton.GetComponentInChildren<Text>().text = "Abandon Room";
         }
@@ -236,6 +239,7 @@ public class UIManager : MonoBehaviour
         if(isPrivate)
         {
             roomTitle.text = gameManager.currentRoom.roomName;
+            startButton.SetActive(true);
         }
         else
         {
@@ -441,9 +445,11 @@ public class UIManager : MonoBehaviour
     {
         RawImage image = mapButton.GetComponent<RawImage>();
         mapButton.GetComponent<RectTransform>().sizeDelta = new Vector2(map._xSize, map._ySize);
-        Texture2D myTexture = new Texture2D(map._xSize, map._ySize);
+        Texture2D myTexture = new Texture2D(map._xSize, map._ySize)
+        {
+            filterMode = FilterMode.Point
+        };
 
-        myTexture.filterMode = FilterMode.Point;
         for (int y = 0; y < myTexture.height; y++)
         {
             for (int x = 0; x < myTexture.width; x++)
@@ -472,7 +478,7 @@ public class UIManager : MonoBehaviour
         timerTillGame = Constants.TIMER_TILL_GAME;
     }
 
-    public void gameInitiatedUI()
+    public void GameInitiatedUI()
     {
         timerTillGame = Constants.TIMER_TILL_GAME;
         roomGameTimerGO.SetActive(true);
@@ -591,6 +597,7 @@ public class UIManager : MonoBehaviour
         roomButtonLeft.SetActive(true);
         roomButtonRight.SetActive(true);
         roomDifficultyDropDown.interactable = true;
+        startButton.GetComponent<Button>().interactable = true;
     }
 
     public void DisableElementsNotAdminUI()
@@ -598,6 +605,7 @@ public class UIManager : MonoBehaviour
         roomButtonLeft.SetActive(false);
         roomButtonRight.SetActive(false);
         roomDifficultyDropDown.interactable = false;
+        startButton.GetComponent<Button>().interactable = false;
     }
 
     public UInt16 GetDifficultyValue()

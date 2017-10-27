@@ -84,6 +84,16 @@ public class Functions : MonoBehaviour
             networkManager.SendPacket(ref dataToSend);
     }
 
+    public void StartGame()
+    {
+        if (gameManager.currentRoom.isAdmin)
+        {
+            byte[] dataToSend = new byte[4];
+            packetHelper.FillHeaderBlankData(Messages.ROOM_GAME_START_REQUEST, ref dataToSend);
+            networkManager.SendPacket(ref dataToSend);
+        }
+    }
+
     public void FindPublicGame()
     {
         if (!gameManager.player._inRoom)

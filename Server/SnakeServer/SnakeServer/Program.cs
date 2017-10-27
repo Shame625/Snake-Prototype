@@ -437,10 +437,24 @@ namespace SnakeServer
                             }
                             break;
                         }
-
+                        //Used in private rooms
                     case Messages.ROOM_GAME_START_REQUEST:
                         {
-                            
+                            if(_connectedClients[clientId]._currentRoom._roomAdmin._clientId == clientId)
+                            {
+                                if(!_connectedClients[clientId]._currentRoom._isEmpty)
+                                {
+                                    _connectedClients[clientId]._currentRoom.StartGame();
+                                }
+                                else
+                                {
+                                    (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(Messages.ROOM_GAME_START_RESPONSE, Constants.ROOM_GAME_STARTED_FAILURE);
+                                }
+                            }
+                            else
+                            {
+                                (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(Messages.ROOM_GAME_START_RESPONSE, Constants.ROOM_GAME_STARTED_FAILURE);
+                            }
                             break;
                         }
 

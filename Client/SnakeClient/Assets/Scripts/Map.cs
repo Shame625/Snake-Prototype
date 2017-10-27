@@ -2,6 +2,9 @@
     {
         public int _xSize;
         public int _ySize;
+
+        public MapManager.Position spawnPoint;
+
         public byte[,] _grid;
 
         public Map(int x, int y)
@@ -9,6 +12,11 @@
             _xSize = x;
             _ySize = y;
             _grid = new byte[x, y];
+        }
+
+        public void SetSpawnPoint(byte x, byte y)
+        {
+            spawnPoint = new MapManager.Position(x, y);
         }
 
         public string PrintMap()

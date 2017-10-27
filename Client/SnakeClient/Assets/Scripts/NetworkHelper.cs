@@ -289,15 +289,21 @@ public class NetworkHelper : MonoBehaviour
 
     public void GameInitiated()
     {
-        uiManager.gameInitiatedUI();
+        uiManager.GameInitiatedUI();
+    }
+
+
+    internal void GameFailedToStart()
+    {
+        uiManager.ShowErrorPanel(Constants.ROOM_FAILED_TO_START_MSG);
     }
 
     public void GameStarted(UInt16 spawnIndex)
     {
         //do something with it
-        Debug.Log(spawnIndex);
+
         MapManager.Position pos = MapManager.getCoordinates(spawnIndex);
-        Debug.Log(pos.x + " " + pos.y);
+
         gameManager.StartGame();
         uiManager.GameStartedUI();
     }
