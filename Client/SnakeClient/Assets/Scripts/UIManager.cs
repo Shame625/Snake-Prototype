@@ -47,7 +47,11 @@ public class UIManager : MonoBehaviour
     //In room commands
     public Text player1;
     public Text player2;
+    public Text roomGameTimer;
+
+    public GameObject roomGameTimerGO;
     public GameObject player2LoadingBar;
+
     public Text roomTitle;
     public Button AbandonButton;
     public GameObject mapButton;
@@ -61,6 +65,8 @@ public class UIManager : MonoBehaviour
     public GameObject errorPanel;
     public Text errorPanelMessage;
 
+    public GameObject uiRoomRelated;
+    public GameObject uiGameRelated;
 
     //Map Colors
     Color Air = Color.white;
@@ -109,6 +115,7 @@ public class UIManager : MonoBehaviour
 
     public void DisplayConnectToServerPanelUI()
     {
+        RoomUI();
         connectionPanel.SetActive(true);
         mainPanel.SetActive(false);
         submitNamePanel.SetActive(false);
@@ -246,6 +253,9 @@ public class UIManager : MonoBehaviour
     {
         player2.text = "";
         player2LoadingBar.SetActive(true);
+
+        ResetClockUI();
+        RoomUI();
     }
 
     public void RoomTypeChangedUI()
@@ -387,6 +397,7 @@ public class UIManager : MonoBehaviour
         if(errorCode == Constants.ROOM_ABANDONED_SUCCESS)
         {
             ShowErrorPanel(Constants.ROOM_ABANDONED_SUCCESS_MSG);
+
             ClearUI();
             DisplayVsPlayerPanelUI();
         }
@@ -429,8 +440,8 @@ public class UIManager : MonoBehaviour
     void DrawMapOnMapElement(ref Map map)
     {
         RawImage image = mapButton.GetComponent<RawImage>();
-        mapButton.GetComponent<RectTransform>().sizeDelta = new Vector2(map._x, map._y);
-        Texture2D myTexture = new Texture2D(map._x, map._y);
+        mapButton.GetComponent<RectTransform>().sizeDelta = new Vector2(map._xSize, map._ySize);
+        Texture2D myTexture = new Texture2D(map._xSize, map._ySize);
 
         myTexture.filterMode = FilterMode.Point;
         for (int y = 0; y < myTexture.height; y++)
@@ -451,6 +462,46 @@ public class UIManager : MonoBehaviour
         myTexture.Apply();
         image.texture = myTexture;
     }
+
+    UInt16 timerTillGame = Constants.TIMER_TILL_GAME;
+
+    public void ResetClockUI()
+    {
+        CancelInvoke("Clock");
+        roomGameTimerGO.SetActive(false);
+        timerTillGame = Constants.TIMER_TILL_GAME;
+    }
+
+    public void gameInitiatedUI()
+    {
+        timerTillGame = Constants.TIMER_TILL_GAME;
+        roomGameTimerGO.SetActive(true);
+        InvokeRepeating("Clock", 0, 1);
+    }
+
+    void Clock()
+    {
+        roomGameTimer.text = "Starting game: " + timerTillGame;
+        timerTillGame--;
+        if(timerTillGame == 0)
+        {
+            CancelInvoke("Clock");
+        }
+    }
+
+    public void GameStartedUI()
+    {
+        uiRoomRelated.SetActive(false);
+        uiGameRelated.SetActive(true);
+    }
+
+    public void RoomUI()
+    {
+        uiRoomRelated.SetActive(true);
+        uiGameRelated.SetActive(false);
+    }
+
+
 
     public void SetDifficultyUI(UInt16 id)
     {

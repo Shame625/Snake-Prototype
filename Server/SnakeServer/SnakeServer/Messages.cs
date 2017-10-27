@@ -47,6 +47,11 @@ namespace SnakeServer
         public const UInt16 ROOM_MAP_CHANGED = 0xAB04;
         public const UInt16 ROOM_DIFFICULTY_CHANGED = 0xAB05;
 
+        public const UInt16 ROOM_GAME_START_REQUEST = 0xAB06;
+        public const UInt16 ROOM_GAME_START_RESPONSE = 0xAB06;
+        public const UInt16 ROOM_GAME_INITIATED = 0xAB07;
+        public const UInt16 ROOM_GAME_STARTED = 0xAB08;
+
         //Chat related packets
         public const UInt16 CHAT_SEND_GLOBAL_MESSAGE_REQUEST = 0xBB00;
         public const UInt16 CHAT_SEND_GLOBAL_MESSAGE_RESPONSE = 0xBB01;

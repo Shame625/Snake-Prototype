@@ -4,9 +4,10 @@
     public class Game
     {
         public Map _selectedMap;
-        public UInt16 _difficulty;    
+        public UInt16 _difficulty;
+        public bool _gameInProgress = false;
 
-        public Game()
+    public Game()
         {
             //Setting Default Map
             _selectedMap = MapManager._Maps[0];
@@ -21,7 +22,8 @@
 
         public void ClearGame()
         {
-             MapManager.Reset();
+            MapManager.Reset();
+            _gameInProgress = false;
             _selectedMap = MapManager._Maps[0];
             _difficulty = Constants.ROOM_DIFFICULTY_EASY;
         }

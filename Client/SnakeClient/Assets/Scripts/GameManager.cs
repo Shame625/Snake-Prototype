@@ -40,4 +40,9 @@ public class GameManager : MonoBehaviour
     {
         currentRoom = newRoom;
     }
+
+    public void StartGame()
+    {
+
+    }
 }

@@ -2,6 +2,8 @@
 
 class Constants
 {
+    public static UInt16 TIMER_TILL_GAME { get { return 10; } }
+
     //Error codes
     public static UInt16 USERNAME_BAD { get { return 0x0000; } }
     public static UInt16 USERNAME_OK { get { return 0x0001; } }
@@ -82,6 +84,9 @@ class Constants
 
     public static UInt16 ROOM_DIFFICULTY_CHANGE_SUCCESS { get { return 0x0001; } }
     public static UInt16 ROOM_DIFFICULTY_CHANGE_FAILURE { get { return 0x0000; } }
+
+    public static UInt16 ROOM_GAME_STARTED_SUCCESS { get { return 0x0001; } }
+    public static UInt16 ROOM_GAME_STARTED_FAILURE { get { return 0x0000; } }
 
     //Room error messages
     public static string ROOM_NAME_BAD_MSG { get { return "Bad room name, must be between " + ROOM_NAME_LENGTH_MIN + " and " + ROOM_NAME_LENGTH_MAX + " characters, and cannot contain special characters!"; } }

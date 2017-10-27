@@ -40,7 +40,7 @@ public class NetworkManager : MonoBehaviour
 
         _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-        IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 50000);
+        IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 100);
         _clientSocket.BeginConnect(endPoint, ConnectCallback, null);
     }
 
@@ -118,9 +118,6 @@ public class NetworkManager : MonoBehaviour
                 networkHelper.BytesToMessageLength(ref message_number_bytes, ref packet_length_bytes, ref message_number, ref packet_length);
                 Debug.Log(message_number + "  " + packet_length);
             }
-            
-            //Packet handling recieving
-            byte[] dataToSendTemp = new byte[512];
 
             #region MESSAGE HANDLING
             switch (message_number)
@@ -421,6 +418,26 @@ public class NetworkManager : MonoBehaviour
                         UnityThreadHelper.Dispatcher.Dispatch(() =>
                         {
                             networkHelper.DifficultyChanged(server_response);
+                        });
+                        break;
+                    }
+
+                case Messages.ROOM_GAME_INITIATED:
+                    {
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.GameInitiated();
+                        });
+                        break;
+                    }
+
+                case Messages.ROOM_GAME_STARTED:
+                    {
+                        UInt16 server_response = packetHelper.BytesToUInt16(ref data);
+
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.GameStarted(server_response);
                         });
                         break;
                     }

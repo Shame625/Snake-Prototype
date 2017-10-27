@@ -4,28 +4,57 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
+
 namespace SnakeServer
 {
-    public class Map
+    class Position
     {
-        int _x;
-        int _y;
-        public byte[,] _grid;
+        public byte _x { get; set; }
+        public byte _y { get; set; }
 
-        public Map(int x, int y)
+        public Position(){}
+
+        public Position(byte x, byte y)
         {
             _x = x;
             _y = y;
+        }
+    };
+
+    public class Map
+    {
+        UInt16 _xSize;
+        UInt16 _ySize;
+        public byte[,] _grid;
+
+        Position _spawnPoint = new Position();
+
+        public Map(UInt16 x, UInt16 y)
+        {
+            _xSize = x;
+            _ySize = y;
             _grid = new byte[x, y];
+        }
+
+        public void SetSpawnPoint(byte x, byte y)
+        {
+            _spawnPoint._x = x;
+            _spawnPoint._y = y;
+        }
+
+        public UInt16 GetSpawnPointIndex()
+        {
+            return MapManager.getIndex(_spawnPoint._x, _spawnPoint._y, _xSize);
         }
 
         public void PrintMap()
         {
             
-            for (int y = 0; y < _y; y++)
+            for (UInt16 y = 0; y < _ySize; y++)
             {
                 string temp = "";
-                for (int x = 0; x < _x; x++)
+                for (UInt16 x = 0; x < _xSize; x++)
                 {
                     temp += _grid[x,y];
                 }

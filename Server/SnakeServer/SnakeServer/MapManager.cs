@@ -44,7 +44,7 @@ namespace SnakeServer
                 int y = rows.Length - 1;
 
                 //Creating new map object
-                Map newMap = new Map(x,y);
+                Map newMap = new Map(Convert.ToUInt16(x), Convert.ToUInt16(y));
 
                 int Y = 0;
                 foreach (string row in rows)
@@ -56,6 +56,12 @@ namespace SnakeServer
                         if (char.IsNumber(c))
                         {
                             newMap._grid[X, Y] = ReturnMapObject(c - '0');
+
+                            if (ReturnMapObject(c - '0') == (int)MapObjects.SPAWN_POINT)
+                            {
+                                newMap.SetSpawnPoint(Convert.ToByte(X), Convert.ToByte(Y));
+                            }
+
                             X++;
                         }
                     }
@@ -64,6 +70,16 @@ namespace SnakeServer
 
                 _Maps.Add(newMap);
             }
+        }
+
+        static public UInt16 getIndex(byte x, byte y, UInt16 length)
+        {
+            return Convert.ToUInt16(y * length + x);
+        }
+
+        static public Position getCoordinates(UInt16 index, UInt16 length)
+        {
+            return new Position(Convert.ToByte(index % length), Convert.ToByte(index / length));
         }
 
         static byte ReturnMapObject(int i)

@@ -41,13 +41,14 @@ namespace SnakeServer
             Console.WriteLine("---------------------------------------------------------");
             Console.WriteLine("Setting up server...");
 
-            _serverSocket.Bind(new IPEndPoint(IPAddress.Any, 50000));
+            _serverSocket.Bind(new IPEndPoint(IPAddress.Any, 100));
             _serverSocket.Listen(5);
             _serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
 
             Console.WriteLine("Frequency of queue dumps set to " + Constants.QUEUE_TIMER_TICK_MILISECONDS + " ms.");
             Console.WriteLine("Receive buffer size set to " + Constants.RECEIVE_BUFFER_SIZE + " bytes.");
             Console.WriteLine("Send buffer size set to " + Constants.SEND_BUFFER_SIZE + " bytes.");
+            Console.WriteLine("Public game starts after " + Constants.ROOM_GAME_TIME_TO_START + " ms.");
             Console.WriteLine("Loading maps...");
             Console.WriteLine("Server is running!");
             Console.WriteLine("---------------------------------------------------------");
@@ -55,13 +56,10 @@ namespace SnakeServer
             MapManager.LoadMaps();
             ClearLogs();
 
-            TimeSpan startTimeSpan = TimeSpan.Zero;
-            TimeSpan periodTimeSpan = TimeSpan.FromMilliseconds(Constants.QUEUE_TIMER_TICK_MILISECONDS);
-
-           System.Threading.Timer timer = new System.Threading.Timer((e) =>
-            {
-                QueueSystem();
-            }, null, startTimeSpan, periodTimeSpan);
+            System.Timers.Timer queueTimer = new System.Timers.Timer();
+            queueTimer.Elapsed += new System.Timers.ElapsedEventHandler(QueueSystem);
+            queueTimer.Interval = Constants.QUEUE_TIMER_TICK_MILISECONDS;
+            queueTimer.Start();
 
         }
 
@@ -423,7 +421,6 @@ namespace SnakeServer
                                     if (request <= Constants.ROOM_DIFFICULTY_HARD)
                                     {
                                         _connectedClients[clientId]._currentRoom.game.SetDifficulty(request);
-                                        _connectedClients[clientId]._currentRoom.StartGame();
                                         (lengthToSend, dataToSendTemp) = packetHelper.UInt16ToBytes(message_number_send, Constants.ROOM_DIFFICULTY_CHANGE_SUCCESS);
                                     }
                                     else
@@ -438,6 +435,12 @@ namespace SnakeServer
                             {
                                 Console.WriteLine("Welp, nice checking...");
                             }
+                            break;
+                        }
+
+                    case Messages.ROOM_GAME_START_REQUEST:
+                        {
+                            
                             break;
                         }
 
@@ -586,6 +589,9 @@ namespace SnakeServer
             serverHelper.PrintSendingData(c._clientId, Messages.ROOM_JOINED_MY_ROOM, Convert.ToUInt16(dataToSendP1.Length), ref dataToSendP1);
             Console.WriteLine("Player 2" + c._userName);
             serverHelper.PrintSendingData(c._clientId, Messages.ROOM_JOINED_PUBLIC_ROOM, Convert.ToUInt16(dataToSendP2.Length), ref dataToSendP2);
+
+            c.EnteredRoom(ref r);
+            r.AddPlayer(ref c);
             //player 1
             try
             {
@@ -593,14 +599,12 @@ namespace SnakeServer
             }
             catch { }
             //player 2
-            c.EnteredRoom(ref r);
-
-            r.AddPlayer(ref c);
             try
             {
                 c._socket.BeginSend(dataToSendP2, 0, dataToSendP2.Length, SocketFlags.None, new AsyncCallback(SendCallback), c._socket);
             }
             catch { }
+           
         }
 
         public static (UInt16, byte[]) SendDataJoinedPrivateRoom(Room r, Client c)
@@ -625,6 +629,36 @@ namespace SnakeServer
             r.AddPlayer(ref c);
 
             return (Convert.ToUInt16(dataToSendP2.Length), dataToSendP2);
+        }
+
+        public static void SendDataGameInitiated(Room r)
+        {
+            byte[] dataToSend = new byte[4];
+            packetHelper.FillHeaderBlankData(Messages.ROOM_GAME_INITIATED, ref dataToSend);
+            try
+            {
+                r.refClients[0]._socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), r.refClients[0]._socket);
+                r.refClients[1]._socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), r.refClients[1]._socket);
+            }
+            catch
+            {
+
+            }
+        }
+
+        public static void SendDataGameStarted(Room r)
+        {
+            
+            byte[] dataToSend = packetHelper.UInt16ToBytesNoLen(Messages.ROOM_GAME_STARTED, r.game._selectedMap.GetSpawnPointIndex());
+            try
+            {
+                r.refClients[0]._socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), r.refClients[0]._socket);
+                r.refClients[1]._socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), r.refClients[1]._socket);
+            }
+            catch
+            {
+
+            }
         }
 
         public static void SendDataRoomAbandoned(Socket s, int id)
@@ -682,7 +716,7 @@ namespace SnakeServer
         }
 
         //Queue system
-        public static void QueueSystem()
+        private static void QueueSystem(Object src, System.Timers.ElapsedEventArgs e)
         {
             //Console.WriteLine("Dumping Queue Number of people waiting: " + _clientQueue.Count + " Number of public rooms: " + _publicRooms.Count);
             if (_clientQueue.Count > 0)

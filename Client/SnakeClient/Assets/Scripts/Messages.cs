@@ -42,4 +42,10 @@ public static class Messages
     public const UInt16 ROOM_CHANGE_MAP_RESPONSE = 0xAB03;
     public const UInt16 ROOM_MAP_CHANGED = 0xAB04;
     public const UInt16 ROOM_DIFFICULTY_CHANGED = 0xAB05;
+
+    public const UInt16 ROOM_GAME_START_REQUEST = 0xAB06;
+    public const UInt16 ROOM_GAME_START_RESPONSE = 0xAB06;
+
+    public const UInt16 ROOM_GAME_INITIATED = 0xAB07;
+    public const UInt16 ROOM_GAME_STARTED = 0xAB08;
 }

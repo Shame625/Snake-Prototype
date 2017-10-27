@@ -6,9 +6,11 @@ namespace SnakeServer
 {
     public class Game
     {
-        Map _selectedMap;
+        public Map _selectedMap;
         public UInt16 _difficulty;
         public UInt16 _mapId;
+
+        public bool _gameInProgress = false;
 
         public Game()
         {

@@ -179,8 +179,10 @@ public class NetworkHelper : MonoBehaviour
         gameManager.player._findingRoom = false;
 
         MapManager.Reset();
+        uiManager.ResetClockUI();
         gameManager.currentRoom.game.ClearGame();
 
+        uiManager.RoomUI();
         uiManager.ClearUI();
         uiManager.ShowErrorPanel(Constants.ROOM_ABANDONED_MSG);
         uiManager.DisplayFindGamePanelUI();
@@ -249,6 +251,7 @@ public class NetworkHelper : MonoBehaviour
 
             MapManager.Reset();
             gameManager.currentRoom.game.ClearGame();
+            uiManager.ResetClockUI();
         }
         uiManager.AbandonRoomUI(errorCode);
     }
@@ -261,6 +264,7 @@ public class NetworkHelper : MonoBehaviour
         MapManager.Reset();
 
         uiManager.ShowErrorPanel(Constants.ROOM_LEAVE_SUCCESS_MSG);
+        uiManager.ResetClockUI();
         uiManager.ClearUI();
         uiManager.DisplayVsPlayerPanelUI();
     }
@@ -281,6 +285,21 @@ public class NetworkHelper : MonoBehaviour
         gameManager.currentRoom.game._difficulty = Constants.ROOM_DIFFICULTY_EASY;
         uiManager.SetDifficultyUI(Constants.ROOM_DIFFICULTY_EASY);
         uiManager.ShowErrorPanel(Constants.ROOM_FAILED_SET_DIFFICULTY_MSG);
+    }
+
+    public void GameInitiated()
+    {
+        uiManager.gameInitiatedUI();
+    }
+
+    public void GameStarted(UInt16 spawnIndex)
+    {
+        //do something with it
+        Debug.Log(spawnIndex);
+        MapManager.Position pos = MapManager.getCoordinates(spawnIndex);
+        Debug.Log(pos.x + " " + pos.y);
+        gameManager.StartGame();
+        uiManager.GameStartedUI();
     }
 
     public string PrintBytes(ref byte[] byteArray)

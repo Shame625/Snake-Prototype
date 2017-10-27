@@ -1,11 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 
-    static class MapManager
+
+
+static class MapManager
     {
-        public enum MapObjects
+    public class Position
+    {
+        public byte x;
+        public byte y;
+
+        public Position(byte v1, byte v2)
+        {
+            x = v1;
+            y = v2;
+        }
+    };
+
+    public enum MapObjects
         {
             AIR,
             WALL,
@@ -24,7 +39,7 @@ using UnityEngine;
         //string mapString = File.ReadAllText("Assets/Files/Maps.txt");
 
         TextAsset mapS = Resources.Load("Files/Maps") as TextAsset;
-        Debug.Log(mapS);
+
             string[] maps = mapS.text.Split('-');
 
             //Keeping track of map number for error checking later
@@ -123,5 +138,15 @@ using UnityEngine;
     public static void FailedToChangeMap()
     {
         currentMapIndex = previousMapIndex;
+    }
+
+    static public UInt16 getIndex(byte x, byte y, UInt16 length)
+    {
+        return Convert.ToUInt16(y * length + x);
+    }
+
+    static public Position getCoordinates(UInt16 index)
+    {
+        return new Position(Convert.ToByte(index % _Maps[currentMapIndex]._xSize), Convert.ToByte(index / _Maps[currentMapIndex]._xSize));
     }
 }

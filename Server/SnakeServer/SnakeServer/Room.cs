@@ -22,9 +22,7 @@ namespace SnakeServer
         public bool _isEmpty { get; set; }
 
         public Game game;
-
-        System.Threading.Timer gameLoopTimer;
-
+       
         public Room(Client c, UInt16 t, int id, string name, string password)
         {
             _type = t;
@@ -58,6 +56,8 @@ namespace SnakeServer
             if(c._isAllowed)
             {
                 refClients[1] = c;
+                if (_type == Constants.ROOM_TYPE_PUBLIC)
+                    StartGame();
             }
             _isEmpty = false;
         }
@@ -67,32 +67,79 @@ namespace SnakeServer
             if(refClients[1] != null)
             {
                 refClients[1] = null;
+                game._gameInProgress = false;
             }
             _isEmpty = true;
+
+            StopGameStart();
         }
 
-        public void StartGame()
+        System.Timers.Timer gameTimer = new System.Timers.Timer();
+        bool firstTick = false;
+
+        public void DisposeOfTimer()
         {
-            Console.WriteLine("Game started");
+            gameTimer.Stop();
+            gameTimer.Dispose();
+        }
 
-            TimeSpan startTimeSpan = TimeSpan.Zero;
-            TimeSpan periodTimeSpan = TimeSpan.FromMilliseconds(100);
-
-            gameLoopTimer = new System.Threading.Timer((e) =>
+        public UInt16 StartGame()
+        {
+            if (!_isEmpty && !game._gameInProgress)
             {
-                GameLoop();
-            }, null, startTimeSpan, periodTimeSpan);
+                Console.WriteLine("Game ID: " + _roomId + " started!");
+
+                //start timer here
+                gameTimer.Elapsed += new System.Timers.ElapsedEventHandler(this.GameLoop);
+                gameTimer.Interval = Constants.ROOM_GAME_TIME_TO_START;
+                gameTimer.Start();
+
+                Program.SendDataGameInitiated(this);
+                return Constants.ROOM_GAME_STARTED_SUCCESS;
+            }
+            return Constants.ROOM_GAME_STARTED_FAILURE;
+        }
+
+        void StopGameStart()
+        {
+            gameTimer.Stop();
+            Console.WriteLine("Game ID: " + _roomId + " stopped!");
         }
 
         public void EndGame()
         {
-            Console.WriteLine("Game ended");
-            gameLoopTimer.Dispose();
+            gameTimer.Stop();
+            Console.WriteLine("Game ID:" + _roomId + "ended");
         }
 
-        void GameLoop()
+        void GameLoop(object src, System.Timers.ElapsedEventArgs e)
         {
-            Program.SendDataJoinedRoom(this, refClients[0]);
+            Console.WriteLine("Loop called from Room ID:" + _roomId);
+            //Logic packets
+            if (!firstTick)
+            {
+                firstTick = true;
+                gameTimer.Interval = ReturnTickSpeed();
+                game._gameInProgress = true;
+                Program.SendDataGameStarted(this);
+            }
+            //Loop
+            else
+            {
+                Console.WriteLine(DateTime.Now.ToLongTimeString());
+            }
+        }
+
+        int ReturnTickSpeed()
+        {
+            if (game._difficulty == Constants.ROOM_DIFFICULTY_EASY)
+                return Constants.ROOM_GAME_TICKS_EASY;
+
+            else if (game._difficulty == Constants.ROOM_DIFFICULTY_NORMAL)
+                return Constants.ROOM_GAME_TICKS_NORMAL;
+
+            else
+                return Constants.ROOM_GAME_TICKS_HARD;
         }
 
     }

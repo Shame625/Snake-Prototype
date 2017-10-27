@@ -103,6 +103,7 @@ namespace SnakeServer
 
         public void DestroyRoom(Room r)
         {
+            r.DisposeOfTimer();
             if(r._type == Constants.ROOM_TYPE_PRIVATE)
             {
                 Program._privateRooms.Remove(r._roomName);
@@ -125,6 +126,7 @@ namespace SnakeServer
 
                         Program.SendDataJoinedRoom(r, Program._connectedClients[Program._clientQueue[0]]);
 
+                        r.StartGame();
                         Program._clientQueue.RemoveAt(0);
 
                         Console.WriteLine("People in queue: " + Program._clientQueue.Count);
