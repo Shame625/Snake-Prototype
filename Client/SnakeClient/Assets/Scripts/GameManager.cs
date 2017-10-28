@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 {
     public NetworkManager networkManager;
     private NetworkHelper networkHelper;
+    private UIManager uiManager;
 
     public Player player;
     public Player opponent;
@@ -36,6 +37,8 @@ public class GameManager : MonoBehaviour
         Application.runInBackground = true;
         networkManager = GetComponent<NetworkManager>();
         networkHelper = GetComponent<NetworkHelper>();
+        uiManager = GetComponent<UIManager>();
+
         player = new Player();
         opponent = new Player();
         currentRoom = new Room();
@@ -58,19 +61,29 @@ public class GameManager : MonoBehaviour
         //Initialize map
         InitializeMap();
 
+        //Invoke GameLoop after 3 seconds
+        Invoke("GameLoop", 3);
+
+        //Play some animation that does 3 2 1 GO
+        uiManager.CountDownToStartUI();
+    }
+
+    public void GameLoop()
+    {
+
     }
 
     public void InitializeMap()
     {
-        foreach(GameObject children in MapParent.transform)
+        foreach(Transform children in MapParent.transform)
         {
-            Destroy(children);
+            Destroy(children.gameObject);
         }
 
         //Spawning map
 
         //Floor tile
-        GameObject temp = (GameObject)Instantiate(FloorTile, new Vector3(currentRoom.game._selectedMap._xSize / 2, -0.5f, currentRoom.game._selectedMap._ySize / 2), FloorTile.transform.rotation);
+        GameObject temp = (GameObject)Instantiate(FloorTile, new Vector3(currentRoom.game._selectedMap._xSize / 2, -0.5f, - (currentRoom.game._selectedMap._ySize / 2)), FloorTile.transform.rotation);
         temp.transform.localScale = new Vector3(currentRoom.game._selectedMap._xSize, currentRoom.game._selectedMap._ySize, 1);
         temp.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(currentRoom.game._selectedMap._xSize, currentRoom.game._selectedMap._ySize);
         temp.transform.SetParent(MapParent.transform);
@@ -87,18 +100,18 @@ public class GameManager : MonoBehaviour
         {
             for (int x = 0; x < currentRoom.game._selectedMap._xSize; x++)
             {
-                SpawnBlock(new Vector3(x, 0, y), currentRoom.game._selectedMap._grid[x, y], false);
-                SpawnBlock(new Vector3(x, 1, y), currentRoom.game._selectedMap._grid[x, y], true);
+                SpawnBlock(new Vector3(x, 0, -y), currentRoom.game._selectedMap._grid[x, y], false);
+                SpawnBlock(new Vector3(x, 1, -y), currentRoom.game._selectedMap._grid[x, y], true);
             }
         }
 
         //SpawnPlayer
-        playerRef = (GameObject)Instantiate(PlayerPrefab, new Vector3(currentRoom.game._selectedMap.spawnPoint.x , 1, currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
+        playerRef = (GameObject)Instantiate(PlayerPrefab, new Vector3(currentRoom.game._selectedMap.spawnPoint.x , 1, -currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
 
         //Spawn Enemy
-        enemyRef = (GameObject)Instantiate(PlayerPrefab, new Vector3(currentRoom.game._selectedMap.spawnPoint.x, 0, currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
+        enemyRef = (GameObject)Instantiate(PlayerPrefab, new Vector3(currentRoom.game._selectedMap.spawnPoint.x, 0, -currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
 
-        Camera.main.transform.position = new Vector3(currentRoom.game._selectedMap._xSize / 2, Camera.main.transform.position.y, currentRoom.game._selectedMap._ySize / 2);
+        Camera.main.transform.position = new Vector3(currentRoom.game._selectedMap._xSize / 2, Camera.main.transform.position.y, - currentRoom.game._selectedMap._ySize / 2);
     }
 
     void SpawnBlock(Vector3 pos, UInt16 type, bool player)

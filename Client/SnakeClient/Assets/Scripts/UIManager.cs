@@ -69,11 +69,13 @@ public class UIManager : MonoBehaviour
     public GameObject uiRoomRelated;
     public GameObject uiGameRelated;
 
+    //Ingame UI
+    public GameObject countdownToStartTextGO;
+
     //Map Colors
     Color Air = Color.white;
     Color Wall = Color.black;
     Color Spawn = Color.green;
-
 
     private void Awake()
     {
@@ -450,7 +452,7 @@ public class UIManager : MonoBehaviour
             filterMode = FilterMode.Point
         };
 
-        for (int y = 0; y < myTexture.height; y++)
+        for (int y = 0; y < map._ySize; y++)
         {
             for (int x = 0; x < myTexture.width; x++)
             {
@@ -559,6 +561,12 @@ public class UIManager : MonoBehaviour
     public void HideErrorPanel()
     {
         errorPanel.SetActive(false);
+    }
+
+    //HardCoded
+    public void CountDownToStartUI()
+    {
+        countdownToStartTextGO.GetComponent<CountDown>().StartCountDown();
     }
 
     public void LastPacketRecievedUI(string s)

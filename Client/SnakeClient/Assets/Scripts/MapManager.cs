@@ -65,7 +65,8 @@ public static class MapManager
                 int Y = 0;
                 foreach (string row in rows)
                 {
-                    int X = 0;
+
+                int X = 0;
 
                     foreach(char c in row)
                     {
