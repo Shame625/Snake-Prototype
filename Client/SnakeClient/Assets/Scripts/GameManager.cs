@@ -63,9 +63,6 @@ public class GameManager : MonoBehaviour
 
         //Invoke GameLoop after 3 seconds
         Invoke("GameLoop", 3);
-
-        //Play some animation that does 3 2 1 GO
-        uiManager.CountDownToStartUI();
     }
 
     public void GameLoop()

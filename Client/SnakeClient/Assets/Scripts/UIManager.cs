@@ -471,18 +471,18 @@ public class UIManager : MonoBehaviour
         image.texture = myTexture;
     }
 
-    UInt16 timerTillGame = Constants.TIMER_TILL_GAME;
+    UInt16 timerTillGame = Constants.ROOM_GAME_TIME_TO_START;
 
     public void ResetClockUI()
     {
         CancelInvoke("Clock");
         roomGameTimerGO.SetActive(false);
-        timerTillGame = Constants.TIMER_TILL_GAME;
+        timerTillGame = Constants.ROOM_GAME_TIME_TO_START;
     }
 
     public void GameInitiatedUI()
     {
-        timerTillGame = Constants.TIMER_TILL_GAME;
+        timerTillGame = Constants.ROOM_GAME_TIME_TO_START;
         roomGameTimerGO.SetActive(true);
         InvokeRepeating("Clock", 0, 1);
     }
@@ -501,6 +501,7 @@ public class UIManager : MonoBehaviour
     {
         uiRoomRelated.SetActive(false);
         uiGameRelated.SetActive(true);
+        CountDownToStartUI();
     }
 
     public void RoomUI()
@@ -508,8 +509,6 @@ public class UIManager : MonoBehaviour
         uiRoomRelated.SetActive(true);
         uiGameRelated.SetActive(false);
     }
-
-
 
     public void SetDifficultyUI(UInt16 id)
     {

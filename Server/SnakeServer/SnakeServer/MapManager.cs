@@ -11,7 +11,7 @@ namespace SnakeServer
         {
             AIR,
             WALL,
-            SPAWN_POINT
+            SPAWN_POINT,
         }
 
         public static int _NumberOfMaps;
@@ -47,6 +47,9 @@ namespace SnakeServer
                 Map newMap = new Map(Convert.ToUInt16(x), Convert.ToUInt16(y));
 
                 int Y = 0;
+                int i = 0;
+                newMap._indexedGrid = new int[x * y];
+
                 foreach (string row in rows)
                 {
                     int X = 0;
@@ -56,6 +59,7 @@ namespace SnakeServer
                         if (char.IsNumber(c))
                         {
                             newMap._grid[X, Y] = ReturnMapObject(c - '0');
+                            newMap._indexedGrid[i] = ReturnMapObject(c - '0');
 
                             if (ReturnMapObject(c - '0') == (int)MapObjects.SPAWN_POINT)
                             {
@@ -63,6 +67,7 @@ namespace SnakeServer
                             }
 
                             X++;
+                            i++;
                         }
                     }
                     Y++;

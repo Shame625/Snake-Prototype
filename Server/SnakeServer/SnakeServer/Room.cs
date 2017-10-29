@@ -69,7 +69,7 @@ namespace SnakeServer
                 refClients[1] = null;
             }
             _isEmpty = true;
-            game._gameInProgress = false;
+            
             StopGameStart();
         }
 
@@ -78,15 +78,24 @@ namespace SnakeServer
 
         public void DisposeOfTimer()
         {
-            gameTimer.Stop();
             gameTimer.Dispose();
         }
+
+        float currentTime;
+        float gameTimeout;
+        float tickSeconds;
+        bool prepare = true;
 
         public UInt16 StartGame()
         {
             if (!_isEmpty && !game._gameInProgress)
             {
                 Console.WriteLine("Game ID: " + _roomId + " started!");
+
+                prepare = true;
+                currentTime = 0;
+                gameTimeout = Constants.ROOM_GAME_TIME_LIMIT / ReturnTickSpeed();
+                tickSeconds = ReturnTickSpeed() / 1000;
 
                 //start timer here
                 gameTimer.Elapsed += new System.Timers.ElapsedEventHandler(this.GameLoop);
@@ -101,31 +110,82 @@ namespace SnakeServer
 
         void StopGameStart()
         {
-            gameTimer.Stop();
-            Console.WriteLine("Game ID: " + _roomId + " stopped!");
+            if (!game._gameInProgress)
+            {
+                gameTimer.Stop();
+                Console.WriteLine("Game ID: " + _roomId + " stopped!");
+            }
+            else
+                EndGame(0xFF);
         }
 
-        public void EndGame()
+        public void EndGame(byte status)
         {
-            gameTimer.Stop();
-            Console.WriteLine("Game ID:" + _roomId + "ended");
+            if (gameTimer.Enabled)
+            {
+                gameTimer.Stop();
+                DisposeOfTimer();
+            }
+            game.Reset();
+            Console.WriteLine("game status: " + status);
+            //send data of game status to players
+            if(status == Constants.GAME_DRAW)
+            {
+                Console.WriteLine("Game ID:" + _roomId + " ended. DRAW!");
+            }
+            else if (status == Constants.GAME_WON_P1)
+            {
+                Console.WriteLine("Game ID:" + _roomId + " ended. P1 Won!");
+            }
+            else if (status == Constants.GAME_WON_P2)
+            {
+                Console.WriteLine("Game ID:" + _roomId + " ended. P2 Won!");
+            }
+            else
+                Console.WriteLine("Game ID:" + _roomId + " ended.");
         }
+
+        int preparation = 4;
 
         void GameLoop(object src, System.Timers.ElapsedEventArgs e)
         {
-            Console.WriteLine("Loop called from Room ID:" + _roomId);
             //Logic packets
             if (!firstTick)
             {
+                Console.WriteLine("Loop called from Room ID:" + _roomId + " First Tick done!");
                 firstTick = true;
-                gameTimer.Interval = ReturnTickSpeed();
+                gameTimer.Interval = 1000;
                 game._gameInProgress = true;
                 Program.SendDataGameStarted(this);
             }
             //Loop
-            else
+            else if(prepare == true)
             {
+                preparation--;
+                Console.WriteLine("Loop called from Room ID:" + _roomId + " Preparation: " + preparation + " .");
+                if (preparation == 1)
+                {
+                    prepare = false;
+                    gameTimer.Interval = ReturnTickSpeed();
+                }
+            }
+            else if(game._gameInProgress)
+            {
+                currentTime += tickSeconds;
                 Console.WriteLine(DateTime.Now.ToLongTimeString());
+
+                byte status = game.Mover();
+
+
+                if(currentTime >= gameTimeout || status != 0xFF)
+                {
+                    //Send game ended packet from EndGame()
+                    EndGame(status);
+                }
+                else
+                {
+                    //Send location packets
+                }
             }
         }
 

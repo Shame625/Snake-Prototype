@@ -86,9 +86,19 @@ namespace SnakeServer
         public static int ROOM_GAME_TICKS_EASY { get { return 1000; } }
         public static int ROOM_GAME_TICKS_NORMAL { get { return 700; } }
         public static int ROOM_GAME_TICKS_HARD { get { return 500; } }
+        public static int ROOM_GAME_TIME_LIMIT { get { return 15000; } }
 
         public static UInt16 ROOM_GAME_STARTED_SUCCESS { get { return 0x0001; } }
         public static UInt16 ROOM_GAME_STARTED_FAILURE { get { return 0x0000; } }
+
+        public static byte GAME_DIRECTION_UP { get { return 0x00; } }
+        public static byte GAME_DIRECTION_DOWN { get { return 0x01; } }
+        public static byte GAME_DIRECTION_LEFT { get { return 0x02; } }
+        public static byte GAME_DIRECTION_RIGHT { get { return 0x03; } }
+
+        public static byte GAME_WON_P1 { get { return 0x01; } }
+        public static byte GAME_WON_P2 { get { return 0x02; } }
+        public static byte GAME_DRAW { get { return 0x03; } }
 
         //Chat system
         public static UInt16 CHAT_MSG_LENGTH_MAX { get { return 100; } }

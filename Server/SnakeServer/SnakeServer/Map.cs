@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SnakeServer
 {
-    class Position
+    public class Position
     {
         public byte _x { get; set; }
         public byte _y { get; set; }
@@ -24,11 +24,13 @@ namespace SnakeServer
 
     public class Map
     {
-        UInt16 _xSize;
-        UInt16 _ySize;
+        public UInt16 _xSize;
+        public UInt16 _ySize;
         public byte[,] _grid;
 
-        Position _spawnPoint = new Position();
+        public int[] _indexedGrid;
+
+        public Position _spawnPoint = new Position();
 
         public Map(UInt16 x, UInt16 y)
         {

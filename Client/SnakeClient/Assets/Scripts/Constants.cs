@@ -2,7 +2,7 @@
 
 class Constants
 {
-    public static UInt16 TIMER_TILL_GAME { get { return 10; } }
+    public static UInt16 ROOM_GAME_TIME_TO_START { get { return 10; } }
 
     //Error codes
     public static UInt16 USERNAME_BAD { get { return 0x0000; } }
@@ -87,6 +87,16 @@ class Constants
 
     public static UInt16 ROOM_GAME_STARTED_SUCCESS { get { return 0x0001; } }
     public static UInt16 ROOM_GAME_STARTED_FAILURE { get { return 0x0000; } }
+
+    public static int ROOM_GAME_TIME_LIMIT { get { return 15000; } }
+
+    public static byte GAME_DIRECTION_UP { get { return 0x00; } }
+    public static byte GAME_DIRECTION_DOWN { get { return 0x01; } }
+    public static byte GAME_DIRECTION_LEFT { get { return 0x02; } }
+    public static byte GAME_DIRECTION_RIGHT { get { return 0x03; } }
+
+    public static byte GAME_WON_P1 { get { return 0x00; } }
+    public static byte GAME_WON_P2 { get { return 0x01; } }
 
     //Room error messages
     public static string ROOM_NAME_BAD_MSG { get { return "Bad room name, must be between " + ROOM_NAME_LENGTH_MIN + " and " + ROOM_NAME_LENGTH_MAX + " characters, and cannot contain special characters!"; } }
