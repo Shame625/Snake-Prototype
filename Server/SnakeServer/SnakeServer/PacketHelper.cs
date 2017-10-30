@@ -29,6 +29,18 @@ namespace SnakeServer
             return (6, data);
         }
 
+        public (byte, byte[]) ByteToBytes(UInt16 msg, byte resp)
+        {
+            byte[] data = new byte[5];
+
+            FillHeader(ref msg, 5, ref data);
+
+            data[4] = resp;
+
+            return (5, data);
+        }
+
+
         public byte[] StringToBytes(UInt16 messageNo, string str)
         {
             byte[] data = Encoding.ASCII.GetBytes(str);
@@ -210,6 +222,76 @@ namespace SnakeServer
             Array.Copy(difficulty_bytes, 0, data, 8, difficulty_bytes.Length);
             Array.Copy(roomNameBytes, 0, data, 10, roomNameBytes.Length);
             Array.Copy(userNameBytes, 0, data, (Constants.ROOM_NAME_LENGTH_MAX - 1) + Constants.MESSAGE_BASE + 6, userNameBytes.Length);
+
+            return data;
+        }
+
+        //base bytes + direction of enemy + did enemy expand + my bug new + my bug new location + enemy bug new + enemy bug new location + [reserved for later]
+        public byte[] MovementPacketOld(UInt16 msg, byte opponentDirection, byte iExpanded, byte opponentExpanded, byte myNewBug, UInt16 myIndexBug, byte opponentNewBug, UInt16 opponentIndexBug)
+        {
+            //base + byte + byte + byte + byte + UInt16 + byte + UInt16
+            UInt16 length = 13;
+
+            byte[] data = new byte[length];
+            FillHeader(ref msg, length, ref data);
+
+            data[4] = opponentDirection;
+            data[5] = iExpanded;
+            data[6] = opponentExpanded;
+
+            data[7] = myNewBug;
+
+            byte[] bugLocation = BitConverter.GetBytes(myIndexBug);
+            Array.Copy(bugLocation, 0, data, 8, 2);
+
+            data[10] = opponentNewBug;
+            bugLocation = BitConverter.GetBytes(opponentIndexBug);
+            Array.Copy(bugLocation, 0, data, 11, 2);
+
+            return data;
+        }
+
+        public byte[] MovementPacket(UInt16 msg, List<UInt16> p1Blocks, List<UInt16> p2Blocks, UInt16 p1Bug, UInt16 p2Bug)
+        {
+            UInt16 length = Convert.ToUInt16(Constants.MESSAGE_BASE + ((p1Blocks.Count + p2Blocks.Count) * 2) + 4 + 4);
+            byte[] data = new byte[length];
+
+            byte[] blockcount = BitConverter.GetBytes(p1Blocks.Count);
+
+            FillHeader(ref msg, length, ref data);
+
+            data[4] = blockcount[0];
+            data[5] = blockcount[1];
+
+            blockcount = BitConverter.GetBytes(p2Blocks.Count);
+            data[6] = blockcount[0];
+            data[7] = blockcount[1];
+
+            UInt16 counter = 8;
+            foreach(UInt16 index in p1Blocks)
+            {
+                byte[] temp = BitConverter.GetBytes(index);
+                data[counter] = temp[0];
+                data[counter + 1] = temp[1];
+                counter += 2;
+            }
+
+            foreach (UInt16 index in p2Blocks)
+            {
+                byte[] temp = BitConverter.GetBytes(index);
+                data[counter] = temp[0];
+                data[counter + 1] = temp[1];
+                counter += 2;
+            }
+
+            byte[] bugLocation = new byte[2];
+            bugLocation = BitConverter.GetBytes(p1Bug);
+            data[data.Length - 4] = bugLocation[0];
+            data[data.Length - 3] = bugLocation[1];
+
+            bugLocation = BitConverter.GetBytes(p2Bug);
+            data[data.Length - 2] = bugLocation[0];
+            data[data.Length - 1] = bugLocation[1];
 
             return data;
         }

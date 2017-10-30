@@ -28,7 +28,7 @@ namespace SnakeServer
         public UInt16 _ySize;
         public byte[,] _grid;
 
-        public int[] _indexedGrid;
+        public UInt16[] _indexedGrid;
 
         public Position _spawnPoint = new Position();
 

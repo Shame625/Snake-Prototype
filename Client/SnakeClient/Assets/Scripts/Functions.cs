@@ -104,6 +104,14 @@ public class Functions : MonoBehaviour
         }
     }
 
+    public void DirectionChanged(byte direction)
+    {
+        byte[] dataToSend = new byte[5];
+        packetHelper.FillHeaderBlankData(Messages.GAME_PLAYER_DIRECTION_CHANGE_REQUEST, ref dataToSend);
+        dataToSend[4] = direction;
+        networkManager.SendPacket(ref dataToSend);
+    }
+
     public void FindPrivateGame()
     {
         string name = uiManager.GetPrivateRoomName();

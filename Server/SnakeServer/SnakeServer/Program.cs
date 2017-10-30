@@ -209,8 +209,15 @@ namespace SnakeServer
                                                 newRoom = roomHelper.CreatePublicRoom(_connectedClients[clientId]);
                                                 _connectedClients[clientId].EnteredRoom(ref newRoom);
 
-                                                _publicRooms.Add(clientId, newRoom);
-                                                roomHelper.PublicGamesTick(newRoom);
+                                                try
+                                                {
+                                                    _publicRooms.Add(clientId, newRoom);
+                                                    roomHelper.PublicGamesTick(newRoom);
+                                                }
+                                                catch
+                                                {
+
+                                                }
                                             }
                                             else
                                             {
@@ -458,6 +465,43 @@ namespace SnakeServer
                             break;
                         }
 
+                    case Messages.GAME_PLAYER_DIRECTION_CHANGE_REQUEST:
+                        {
+                            message_number_send = Messages.GAME_PLAYER_DIRECTION_CHANGE_RESPONSE;
+                            byte direction = data[0];
+
+                            if(_connectedClients[clientId]._isInRoom && _connectedClients[clientId]._currentRoom.game._gameInProgress)
+                            {
+                                byte currentDir = 0;
+                                bool player = false;
+
+                                if(_connectedClients[clientId]._currentRoom.refClients[0]._clientId == clientId)
+                                {
+                                    currentDir = _connectedClients[clientId]._currentRoom.game.P1Direction;
+                                }
+                                else
+                                {
+                                    currentDir = _connectedClients[clientId]._currentRoom.game.P2Direction;
+                                    player = true;
+                                }
+                                
+                                if(Game.CheckValidDirection(currentDir, direction))
+                                {
+                                    //player 1
+                                    if(!player)
+                                    {
+                                        _connectedClients[clientId]._currentRoom.game.P1Direction = direction;
+                                    }
+                                    else
+                                    {
+                                        _connectedClients[clientId]._currentRoom.game.P2Direction = direction;
+                                    }
+                                    (lengthToSend, dataToSendTemp) = packetHelper.ByteToBytes(message_number_send, direction);
+                                } 
+                            }
+                            break;
+                        }
+
                     #endregion
                     #region ADMIN_STUFF
                     case Messages.ADMIN_LOGIN_REQUEST:
@@ -551,6 +595,47 @@ namespace SnakeServer
                 Console.WriteLine(ex.Message);
             }
         }
+        public static void DisconnectUser(Socket socket)
+        {
+            byte[] dataToSend = packetHelper.UInt16ToBytesNoLen(Messages.USER_DISCONNECT, Constants.FORCED_DISCONNECT);
+
+            if (_connectedClients[socket.GetHashCode()]._currentRoom != null)
+            {
+                int id = _connectedClients[socket.GetHashCode()]._currentRoom._roomAdmin._clientId;
+
+                //if user is admin, kick other guy
+                if (socket.GetHashCode() == id)
+                {
+                    Room r = _connectedClients[socket.GetHashCode()]._currentRoom;
+                    try
+                    {
+                        SendDataRoomAbandoned(_connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._socket, _connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._clientId);
+                    }
+                    catch
+                    { }
+
+                    roomHelper.DestroyRoom(r);
+                }
+                else
+                {
+                    SendDataPlayerLeftRoom(id);
+                    _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
+                }
+            }
+            try
+            {
+                socket.BeginSend(dataToSend, 0, dataToSend.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            RemoveClient(ref socket, Constants.LOGOUT_WARNING);
+        }
 
         public static void DisconnectUser(ref Socket socket)
         {
@@ -570,6 +655,7 @@ namespace SnakeServer
                     }
                     catch
                     { }
+
                     roomHelper.DestroyRoom(r);
                 }
                 else
@@ -729,6 +815,27 @@ namespace SnakeServer
             }
         }
 
+        public static void SendLocationData(ref byte[] data, Room r)
+        {
+            try
+            {
+                r.refClients[0]._socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendCallback), r.refClients[0]._socket);
+               
+            }
+            catch
+            {
+                DisconnectUser(r.refClients[0]._socket);
+            }
+            try
+            {
+                r.refClients[1]._socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendCallback), r.refClients[1]._socket);
+            }
+            catch
+            {
+                DisconnectUser(r.refClients[1]._socket);
+            }
+        }
+
         //Queue system
         private static void QueueSystem(Object src, System.Timers.ElapsedEventArgs e)
         {
@@ -747,13 +854,21 @@ namespace SnakeServer
 
                 if (roomRef != null)
                 {
-                    Client clientRef = _connectedClients[_clientQueue[0]];
-                    _clientQueue.RemoveAt(0);
+                    try
+                    {
+                        Client clientRef = _connectedClients[_clientQueue[0]];
+                        _clientQueue.RemoveAt(0);
 
-                    roomRef.AddPlayer(ref clientRef);
-                    clientRef.EnteredRoom(ref roomRef);
 
-                    SendDataJoinedRoom(roomRef, clientRef);
+                        roomRef.AddPlayer(ref clientRef);
+                        clientRef.EnteredRoom(ref roomRef);
+
+                        SendDataJoinedRoom(roomRef, clientRef);
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Pokemon");
+                    }
                 }
             }
         }
@@ -800,6 +915,7 @@ namespace SnakeServer
                 else
                 {
                     SendDataPlayerLeftRoom(id);
+                    _connectedClients[socket.GetHashCode()]._currentRoom.EndGame(0xFF);
                     _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
                 }
             }

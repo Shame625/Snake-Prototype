@@ -1,13 +1,17 @@
-﻿public class Map
+﻿using System;
+
+public class Map
     {
-        public int _xSize;
-        public int _ySize;
+        public UInt16 _xSize;
+        public UInt16 _ySize;
 
         public MapManager.Position spawnPoint;
 
         public byte[,] _grid;
+        public UInt16[] _indexedGrid;
+        public UInt16 startIndex;
 
-        public Map(int x, int y)
+        public Map(UInt16 x, UInt16 y)
         {
             _xSize = x;
             _ySize = y;

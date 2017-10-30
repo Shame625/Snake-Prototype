@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -306,6 +307,35 @@ public class NetworkHelper : MonoBehaviour
 
         gameManager.StartGame();
         uiManager.GameStartedUI();
+    }
+
+    public void MovementOld(ref byte direction, ref byte iExpanded, ref byte opponentExpaded, ref byte myNewBug, ref UInt16 myIndexBug, ref byte opponentNewBug, ref UInt16 opponentIndexBug)
+    {
+        //do this after block loops
+        gameManager.currentRoom.game._currentLocationP2 = gameManager.currentRoom.game.ReturnNewIndex(gameManager.currentRoom.game.P2Direction, gameManager.currentRoom.game._currentLocationP2);
+
+        gameManager.currentRoom.game.P2Direction = direction;
+        //Gotta implement bug things and expansions
+
+        //Call GameLoop
+        gameManager.GameLoop();
+    }
+
+    public void Movement(List<UInt16> p1Blocks, List<UInt16> p2Blocks, ref UInt16 bugLocationP1, ref UInt16 bugLocationP2)
+    {
+        gameManager.currentRoom.game._P1blocks = p1Blocks;
+        gameManager.currentRoom.game._P2blocks = p2Blocks;
+
+        gameManager.currentRoom.game.bugLocationP1 = bugLocationP1;
+        gameManager.currentRoom.game.bugLocationP2 = bugLocationP2;
+
+        gameManager.GameLoop();
+    }
+
+    public void ChangeMyDirection(ref byte direction)
+    {
+        gameManager.currentRoom.game.P1Direction = direction;
+        Debug.Log(gameManager.currentRoom.game.P1Direction);
     }
 
     public string PrintBytes(ref byte[] byteArray)

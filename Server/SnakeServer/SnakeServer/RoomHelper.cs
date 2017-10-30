@@ -103,8 +103,8 @@ namespace SnakeServer
 
         public void DestroyRoom(Room r)
         {
-            r.DisposeOfTimer();
-            if(r._type == Constants.ROOM_TYPE_PRIVATE)
+            r.EndGame(0xFF);
+            if (r._type == Constants.ROOM_TYPE_PRIVATE)
             {
                 Program._privateRooms.Remove(r._roomName);
             }

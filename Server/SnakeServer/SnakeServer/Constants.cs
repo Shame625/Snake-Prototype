@@ -83,10 +83,10 @@ namespace SnakeServer
 
         //Game constatns
         public static int ROOM_GAME_TIME_TO_START { get { return 10000; } }
-        public static int ROOM_GAME_TICKS_EASY { get { return 1000; } }
+        public static int ROOM_GAME_TICKS_EASY { get { return 100; } }
         public static int ROOM_GAME_TICKS_NORMAL { get { return 700; } }
         public static int ROOM_GAME_TICKS_HARD { get { return 500; } }
-        public static int ROOM_GAME_TIME_LIMIT { get { return 15000; } }
+        public static int ROOM_GAME_TIME_LIMIT { get { return 120000; } }
 
         public static UInt16 ROOM_GAME_STARTED_SUCCESS { get { return 0x0001; } }
         public static UInt16 ROOM_GAME_STARTED_FAILURE { get { return 0x0000; } }

@@ -9,6 +9,8 @@ namespace SnakeServer
 
     public class Room
     {
+        PacketHelper packetHelper = new PacketHelper();
+
         public UInt16 _type { get; }
 
         public int _roomId { get; }
@@ -76,11 +78,6 @@ namespace SnakeServer
         System.Timers.Timer gameTimer = new System.Timers.Timer();
         bool firstTick = false;
 
-        public void DisposeOfTimer()
-        {
-            gameTimer.Dispose();
-        }
-
         float currentTime;
         float gameTimeout;
         float tickSeconds;
@@ -110,22 +107,14 @@ namespace SnakeServer
 
         void StopGameStart()
         {
-            if (!game._gameInProgress)
-            {
-                gameTimer.Stop();
-                Console.WriteLine("Game ID: " + _roomId + " stopped!");
-            }
-            else
-                EndGame(0xFF);
+            EndGame(0xFF);
         }
 
         public void EndGame(byte status)
         {
-            if (gameTimer.Enabled)
-            {
-                gameTimer.Stop();
-                DisposeOfTimer();
-            }
+            gameTimer.Stop();
+            gameTimer.Dispose();
+
             game.Reset();
             Console.WriteLine("game status: " + status);
             //send data of game status to players
@@ -185,6 +174,12 @@ namespace SnakeServer
                 else
                 {
                     //Send location packets
+                    /*
+                    byte[] p1Data = packetHelper.MovementPacketOld(Messages.GAME_MOVEMENT, game.P2Direction, 0, 0, 0, 0, 0, 0);
+                    byte[] p2Data = packetHelper.MovementPacketOld(Messages.GAME_MOVEMENT, game.P1Direction, 0, 0, 0, 0, 0, 0);
+                    */
+                    byte[] movementPacket = packetHelper.MovementPacket(Messages.GAME_MOVEMENT, game._P1blocks, game._P2blocks, game.bugLocationP1, game.bugLocationP2);
+                    Program.SendLocationData(ref movementPacket, this);
                 }
             }
         }

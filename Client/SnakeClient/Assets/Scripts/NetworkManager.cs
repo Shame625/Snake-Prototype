@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -116,7 +117,6 @@ public class NetworkManager : MonoBehaviour
                 
                 //Turn bytes to usuable data
                 networkHelper.BytesToMessageLength(ref message_number_bytes, ref packet_length_bytes, ref message_number, ref packet_length);
-                Debug.Log(message_number + "  " + packet_length);
             }
 
             #region MESSAGE HANDLING
@@ -452,6 +452,48 @@ public class NetworkManager : MonoBehaviour
                                 networkHelper.GameFailedToStart();
                             });
                         }
+                        break;
+                    }
+
+                /*
+            case Messages.GAME_MOVEMENT:
+                {
+                    byte iExpanded = 0, opponentExpanded = 0, myNewBug = 0, opponentNewBug = 0;
+                    UInt16 myBugIndex = 0, opponentBugIndex = 0;
+
+                    byte direction = packetHelper.MovementBytesToDataOld(ref data, ref iExpanded, ref opponentExpanded, ref myNewBug, ref myBugIndex, ref opponentNewBug, ref opponentBugIndex);
+
+                    UnityThreadHelper.Dispatcher.Dispatch(() =>
+                    {
+                        networkHelper.MovementOld(ref direction, ref iExpanded, ref opponentExpanded, ref myNewBug, ref myBugIndex, ref opponentNewBug, ref opponentBugIndex);
+                    });
+                    break;
+                }
+                */
+                case Messages.GAME_MOVEMENT:
+                    {
+                        List<UInt16> p1blocks = new List<UInt16>();
+                        List<UInt16> p2blocks = new List<UInt16>();
+
+                        UInt16 bugLocationP1 = 0;
+                        UInt16 bugLocationP2 = 0;
+
+                        packetHelper.MovementBytesToData(ref data, p1blocks, p2blocks, ref bugLocationP1, ref bugLocationP2);
+
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.Movement(p1blocks, p2blocks, ref bugLocationP1, ref bugLocationP2);
+                        });
+                        break;
+                    }
+
+                case Messages.GAME_PLAYER_DIRECTION_CHANGE_RESPONSE:
+                    {
+                        byte direction = data[0];
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.ChangeMyDirection(ref direction);
+                        });
                         break;
                     }
 

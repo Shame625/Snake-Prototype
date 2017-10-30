@@ -48,4 +48,10 @@ public static class Messages
 
     public const UInt16 ROOM_GAME_INITIATED = 0xAB07;
     public const UInt16 ROOM_GAME_STARTED = 0xAB08;
+
+    //Ingame messages
+    public const UInt16 GAME_MOVEMENT = 0xAB09;
+    public const UInt16 GAME_ENDED = 0xAB10;
+    public const UInt16 GAME_PLAYER_DIRECTION_CHANGE_REQUEST = 0xAB11;
+    public const UInt16 GAME_PLAYER_DIRECTION_CHANGE_RESPONSE = 0xAB12;
 }

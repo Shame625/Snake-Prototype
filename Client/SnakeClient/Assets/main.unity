@@ -3146,7 +3146,7 @@ Light:
   serializedVersion: 7
   m_Type: 1
   m_Color: {r: 0.9904322, g: 0.99264705, b: 0.8320718, a: 1}
-  m_Intensity: 0.5
+  m_Intensity: 0.56
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -7223,7 +7223,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 50
+  field of view: 10
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -7246,7 +7246,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1275839949}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 19, z: -10}
+  m_LocalPosition: {x: 0, y: 100, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -10172,7 +10172,9 @@ MonoBehaviour:
   enteredroomType: 0
   enteredRoomName: 
   MapParent: {fileID: 74650755}
-  PlayerPrefab: {fileID: 1401919044836588, guid: e54d04082f4c2f74c8f07957cdc78416,
+  PlayerPrefab: {fileID: 1923930114647816, guid: 4840e91d44b96c94cb908cf731e1980d,
+    type: 2}
+  OpponentPrefab: {fileID: 1923930114647816, guid: 096807361e9823249ac04e1f23467cb6,
     type: 2}
   FloorTile: {fileID: 1411779221502684, guid: 6bc07d70c0903d54b8a8078484a41bb1, type: 2}
   FloorTileTransparent: {fileID: 1696234140306948, guid: 538b8ee1ae6fa2148bc96fe2a29e7edc,
@@ -10181,6 +10183,12 @@ MonoBehaviour:
     type: 2}
   playerWallTexture: {fileID: 2800000, guid: cf0b7ef4a651ca44fb25b3e1eb9e3ce6, type: 3}
   enemyWallTexture: {fileID: 2800000, guid: 582aa8e2d99591a42a70cae93e9bb1f3, type: 3}
+  enemyRef: {fileID: 0}
+  playerRef: {fileID: 0}
+  bugPrefabPlayer: {fileID: 1434910588526818, guid: a66bd11a040bf314788b498e81436cc0,
+    type: 2}
+  bugPrefabOpponent: {fileID: 1434910588526818, guid: 25e30eb822d8aa847a2cdff7d5b74466,
+    type: 2}
 --- !u!114 &1802565991
 MonoBehaviour:
   m_ObjectHideFlags: 0

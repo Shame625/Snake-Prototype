@@ -48,7 +48,7 @@ namespace SnakeServer
 
                 int Y = 0;
                 int i = 0;
-                newMap._indexedGrid = new int[x * y];
+                newMap._indexedGrid = new UInt16[x * y];
 
                 foreach (string row in rows)
                 {

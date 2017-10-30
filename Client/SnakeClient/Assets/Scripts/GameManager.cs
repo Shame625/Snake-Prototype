@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     public NetworkManager networkManager;
     private NetworkHelper networkHelper;
     private UIManager uiManager;
+    Functions functions;
 
     public Player player;
     public Player opponent;
@@ -21,14 +22,25 @@ public class GameManager : MonoBehaviour
     public GameObject MapParent;
 
     public GameObject PlayerPrefab;
+    public GameObject OpponentPrefab;
+
     public GameObject FloorTile;
     public GameObject FloorTileTransparent;
     public GameObject MapWallPrefab;
     public Texture playerWallTexture;
     public Texture enemyWallTexture;
 
-    GameObject enemyRef;
-    GameObject playerRef;
+    public GameObject enemyRef;
+    public GameObject playerRef;
+
+    List<GameObject> player1Blocks = new List<GameObject>();
+    List<GameObject> player2Blocks = new List<GameObject>();
+
+    public GameObject bugPrefabPlayer;
+    public GameObject bugPrefabOpponent;
+
+    GameObject player1Bug;
+    GameObject player2Bug;
 
     private void Awake()
     {
@@ -38,6 +50,7 @@ public class GameManager : MonoBehaviour
         networkManager = GetComponent<NetworkManager>();
         networkHelper = GetComponent<NetworkHelper>();
         uiManager = GetComponent<UIManager>();
+        functions = GetComponent<Functions>();
 
         player = new Player();
         opponent = new Player();
@@ -60,14 +73,87 @@ public class GameManager : MonoBehaviour
     {
         //Initialize map
         InitializeMap();
+        Invoke("setGameInProgress", 3);
+        currentRoom.game.SetGame();
+    }
 
-        //Invoke GameLoop after 3 seconds
-        Invoke("GameLoop", 3);
+    void setGameInProgress()
+    {
+        currentRoom.game._gameInProgress = true;
+    }
+
+    private float _timer = 0f;
+
+    private void Update()
+    {
+        _timer += Time.deltaTime;
+
+        if (_timer > 0.015f)
+        {
+            //This must be sent to server!
+            if (currentRoom.game._gameInProgress)
+            {
+                if (Input.GetKeyDown(KeyCode.W))
+                {
+                    functions.DirectionChanged(Constants.GAME_DIRECTION_UP);
+                }
+                else if (Input.GetKeyDown(KeyCode.S))
+                {
+                    functions.DirectionChanged(Constants.GAME_DIRECTION_DOWN);
+                }
+                else if (Input.GetKeyDown(KeyCode.A))
+                {
+                    functions.DirectionChanged(Constants.GAME_DIRECTION_LEFT);
+                }
+                else if (Input.GetKeyDown(KeyCode.D))
+                {
+                    functions.DirectionChanged(Constants.GAME_DIRECTION_RIGHT);
+                }
+            }
+            _timer = 0;
+        }
     }
 
     public void GameLoop()
     {
+        /*
+        MapManager.Position P2Position =  MapManager.getCoordinates(Convert.ToUInt16(currentRoom.game._currentLocationP2));
 
+        currentRoom.game._currentLocationP1 = currentRoom.game.ReturnNewIndex(currentRoom.game.P1Direction, currentRoom.game._currentLocationP1);
+        MapManager.Position P1Position = MapManager.getCoordinates(Convert.ToUInt16(currentRoom.game._currentLocationP1));
+
+        playerRef.transform.position = new Vector3(P1Position.x, playerRef.transform.position.y, -P1Position.y);
+        enemyRef.transform.position = new Vector3(P2Position.x, enemyRef.transform.position.y, -P2Position.y);
+        */
+
+        if(player1Blocks.Count != currentRoom.game._P1blocks.Count)
+        {
+            GameObject temp = (GameObject)Instantiate(PlayerPrefab, Vector3.zero, Quaternion.identity);
+            player1Blocks.Add(temp);
+        }
+        if (player2Blocks.Count != currentRoom.game._P2blocks.Count)
+        {
+            GameObject temp = (GameObject)Instantiate(OpponentPrefab, Vector3.zero, Quaternion.identity);
+            player2Blocks.Add(temp);
+        }
+
+        for (int i = 0; i < currentRoom.game._P1blocks.Count; i++)
+        {
+            MapManager.Position P1Position = MapManager.getCoordinates(currentRoom.game._P1blocks[i]);
+            player1Blocks[i].transform.position = new Vector3(P1Position.x, player1Blocks[0].transform.position.y, -P1Position.y);
+        }
+
+        for (int i = 0; i < currentRoom.game._P2blocks.Count; i++)
+        {
+            MapManager.Position P2Position = MapManager.getCoordinates(currentRoom.game._P2blocks[i]);
+            player2Blocks[i].transform.position = new Vector3(P2Position.x, player2Blocks[0].transform.position.y, -P2Position.y);
+        }
+
+        MapManager.Position bugP1Position = MapManager.getCoordinates(currentRoom.game.bugLocationP1);
+        player1Bug.transform.position = new Vector3(bugP1Position.x, player1Blocks[0].transform.position.y, - bugP1Position.y);
+
+        MapManager.Position bugP2Position = MapManager.getCoordinates(currentRoom.game.bugLocationP2);
+        player2Bug.transform.position = new Vector3(bugP2Position.x, player2Blocks[0].transform.position.y, -bugP2Position.y);
     }
 
     public void InitializeMap()
@@ -104,9 +190,13 @@ public class GameManager : MonoBehaviour
 
         //SpawnPlayer
         playerRef = (GameObject)Instantiate(PlayerPrefab, new Vector3(currentRoom.game._selectedMap.spawnPoint.x , 1, -currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
-
+        player1Blocks.Add(playerRef);
         //Spawn Enemy
-        enemyRef = (GameObject)Instantiate(PlayerPrefab, new Vector3(currentRoom.game._selectedMap.spawnPoint.x, 0, -currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
+        enemyRef = (GameObject)Instantiate(OpponentPrefab, new Vector3(currentRoom.game._selectedMap.spawnPoint.x, 0, -currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
+        player2Blocks.Add(enemyRef);
+
+        player1Bug = (GameObject)Instantiate(bugPrefabPlayer, new Vector3(currentRoom.game._selectedMap.spawnPoint.x, -20, -currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
+        player2Bug = (GameObject)Instantiate(bugPrefabOpponent, new Vector3(currentRoom.game._selectedMap.spawnPoint.x, -20, -currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
 
         Camera.main.transform.position = new Vector3(currentRoom.game._selectedMap._xSize / 2, Camera.main.transform.position.y, - currentRoom.game._selectedMap._ySize / 2);
     }

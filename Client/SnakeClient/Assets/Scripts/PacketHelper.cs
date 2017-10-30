@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -177,6 +178,76 @@ public class PacketHelper : MonoBehaviour
 
         Array.Copy(response, 0, data, 4, response.Length);
         return data;
+    }
+
+    public  byte[] ByteToBytes(UInt16 msg, byte resp)
+    {
+        byte[] data = new byte[5];
+        UInt16 len = 5;
+
+        FillHeader(ref msg, ref len, ref data);
+
+        data[4] = resp;
+
+        return  data;
+    }
+
+    public byte MovementBytesToDataOld(ref byte[] data, ref byte iExpanded, ref byte opponentExpaded, ref byte myNewBug, ref UInt16 myIndexBug, ref byte opponentNewBug, ref UInt16 opponentIndexBug)
+    {
+        byte[] myIndexBugBytes = new byte[2];
+        byte[] opponentIndexBugBytes = new byte[2];
+
+        Array.Copy(data, 4, myIndexBugBytes, 0, 2);
+        Array.Copy(data, 7, opponentIndexBugBytes, 0, 2);
+
+        iExpanded = data[1];
+        opponentExpaded = data[2];
+        myNewBug = data[3];
+        opponentNewBug = data[6];
+
+        return data[0];
+    }
+
+    public void MovementBytesToData(ref byte[] data, List<UInt16> p1, List<UInt16> p2, ref UInt16 bugLocationP1, ref UInt16 bugLocationP2)
+    {
+        byte[] p1listLen = new byte[2];
+        byte[] p2listLen = new byte[2];
+
+        UInt16 p1len;
+        UInt16 p2len;
+
+        p1listLen[0] = data[0];
+        p1listLen[1] = data[1];
+        p2listLen[0] = data[2];
+        p2listLen[1] = data[3];
+
+        p1len = BitConverter.ToUInt16(p1listLen, 0);
+        p2len = BitConverter.ToUInt16(p2listLen, 0);
+
+        byte[] tempBytes = new byte[2];
+
+        for (int i = 0; i < p1len; i++)
+        {
+            Array.Copy(data, 4 + (i * 2), tempBytes, 0, 2);
+            p1.Add(BitConverter.ToUInt16(tempBytes, 0));
+        }
+
+        for (int i = 0; i < p2len; i++)
+        {
+            Array.Copy(data, 4 + (p1len * 2) + (i * 2), tempBytes, 0, 2);
+            p2.Add(BitConverter.ToUInt16(tempBytes, 0));
+        }
+
+        byte[] p1BugLocation = new byte[2];
+        byte[] p2BugLocation = new byte[2];
+
+        p1BugLocation[0] = data[data.Length - 4];
+        p1BugLocation[1] = data[data.Length - 3];
+        p2BugLocation[0] = data[data.Length - 2];
+        p2BugLocation[1] = data[data.Length - 1];
+
+        bugLocationP1 = BitConverter.ToUInt16(p1BugLocation, 0);
+        bugLocationP2 = BitConverter.ToUInt16(p2BugLocation, 0);
     }
 
     public UInt16 BytesToUInt16(ref byte[] data)

@@ -56,16 +56,18 @@ public static class MapManager
                     rows =  rows.Skip(1).ToArray();
                 }
 
-                int x = rows[0].Length - 1;
-                int y = rows.Length - 1;
+                UInt16 x = Convert.ToUInt16(rows[0].Length - 1);
+                UInt16 y = Convert.ToUInt16(rows.Length - 1);
 
                 //Creating new map object
                 Map newMap = new Map(x,y);
-
+               
                 int Y = 0;
+                UInt16 i = 0;
+                newMap._indexedGrid = new UInt16[x * y];
+
                 foreach (string row in rows)
                 {
-
                 int X = 0;
 
                     foreach(char c in row)
@@ -73,14 +75,21 @@ public static class MapManager
                         if (char.IsNumber(c))
                         {
                             newMap._grid[X, Y] = ReturnMapObject(c - '0');
+                            newMap._indexedGrid[i] = ReturnMapObject(c - '0');
+
 
                         if (ReturnMapObject(c - '0') == (int)MapObjects.SPAWN_POINT)
+                        {
                             newMap.SetSpawnPoint((byte)X, (byte)Y);
+                            newMap.startIndex = i;
+                        }
 
-                            X++;
+                         X++;
+                         i++;
                         }
                     }
                     Y++;
+
                 }
 
                 _Maps.Add(newMap);
