@@ -95,8 +95,11 @@ class Constants
     public static byte GAME_DIRECTION_LEFT { get { return 0x02; } }
     public static byte GAME_DIRECTION_RIGHT { get { return 0x03; } }
 
-    public static byte GAME_WON_P1 { get { return 0x00; } }
-    public static byte GAME_WON_P2 { get { return 0x01; } }
+    public static byte GAME_WON_P1 { get { return 0x01; } }
+    public static byte GAME_LOST_P1 { get { return 0x02; } }
+    public static byte GAME_DRAW { get { return 0x03; } }
+
+    public static byte GAME_ENDED { get { return 0xFF; } }
 
     //Room error messages
     public static string ROOM_NAME_BAD_MSG { get { return "Bad room name, must be between " + ROOM_NAME_LENGTH_MIN + " and " + ROOM_NAME_LENGTH_MAX + " characters, and cannot contain special characters!"; } }
@@ -118,4 +121,9 @@ class Constants
     public static string ROOM_FAILED_SET_MAP_MSG { get { return "Failed to set map!"; } }
     public static string ROOM_FAILED_SET_DIFFICULTY_MSG { get { return "Failed to set difficulty!"; } }
     public static string ROOM_FAILED_TO_START_MSG { get { return "Empty room or you are not the host!"; } }
+    public static string GAME_WON_MSG { get { return "You have won!"; } }
+    public static string GAME_LOST_MSG { get { return "You have lost!"; } }
+    public static string GAME_DRAW_MSG { get { return "Draw!"; } }
+    public static string GAME_ENDED_MSG { get { return "Game closed!"; } }
+
 }

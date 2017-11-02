@@ -128,6 +128,8 @@ public class UIManager : MonoBehaviour
         findGamePanel.SetActive(false);
         findingPublicGamePanel.SetActive(false);
         HideDisplayFindPrivateGamePanelUI();
+        uiGameRelated.SetActive(false);
+        uiRoomRelated.SetActive(true);
     }
 
     public void DisplaySubmitUserNamePanelUI()
@@ -142,6 +144,8 @@ public class UIManager : MonoBehaviour
         inRoomPanel.SetActive(false);
         findGamePanel.SetActive(false);
         HideDisplayFindPrivateGamePanelUI();
+        uiGameRelated.SetActive(false);
+        uiRoomRelated.SetActive(true);
     }
 
     public void DisplayMainMenuUI()
@@ -154,6 +158,8 @@ public class UIManager : MonoBehaviour
         inRoomPanel.SetActive(false);
         findGamePanel.SetActive(false);
         HideDisplayFindPrivateGamePanelUI();
+        uiGameRelated.SetActive(false);
+        uiRoomRelated.SetActive(true);
 
         userNameText.text = "Welcome " + gameManager.player._userName;
         debugNameText.text = gameManager.player._userName;
@@ -167,6 +173,8 @@ public class UIManager : MonoBehaviour
         inRoomPanel.SetActive(false);
         findGamePanel.SetActive(false);
         HideDisplayFindPrivateGamePanelUI();
+        uiGameRelated.SetActive(false);
+        uiRoomRelated.SetActive(true);
     }
 
     public void DisplayCreateGamePanelUI()
@@ -177,6 +185,8 @@ public class UIManager : MonoBehaviour
         createRoomPanel.SetActive(true);
         inRoomPanel.SetActive(false);
         HideDisplayFindPrivateGamePanelUI();
+        uiGameRelated.SetActive(false);
+        uiRoomRelated.SetActive(true);
     }
 
     public void DisplayFindGamePanelUI()
@@ -186,16 +196,22 @@ public class UIManager : MonoBehaviour
         findingPublicGamePanel.SetActive(false);
         inRoomPanel.SetActive(false);
         HideDisplayFindPrivateGamePanelUI();
+        uiGameRelated.SetActive(false);
+        uiRoomRelated.SetActive(true);
     }
 
     public void DisplayFindPrivateGamePanelUI()
     {
         findPrivateGamePanel.SetActive(true);
+        uiGameRelated.SetActive(false);
+        uiRoomRelated.SetActive(true);
     }
 
     public void HideDisplayFindPrivateGamePanelUI()
     {
         findPrivateGamePanel.SetActive(false);
+        uiGameRelated.SetActive(false);
+        uiRoomRelated.SetActive(true);
     }
 
     public void RoomCreatedUI()
@@ -225,6 +241,8 @@ public class UIManager : MonoBehaviour
 
     public void DisplayRoomPanelUI(bool isPrivate)
     {
+        uiGameRelated.SetActive(false);
+
         player1.text = gameManager.player._userName;
         player2.text = gameManager.opponent._userName;
         player2LoadingBar.SetActive(false);
@@ -478,11 +496,13 @@ public class UIManager : MonoBehaviour
         CancelInvoke("Clock");
         roomGameTimerGO.SetActive(false);
         timerTillGame = Constants.ROOM_GAME_TIME_TO_START;
+        roomGameTimer.text = timerTillGame.ToString();
     }
 
     public void GameInitiatedUI()
     {
         timerTillGame = Constants.ROOM_GAME_TIME_TO_START;
+        roomGameTimer.text = timerTillGame.ToString();
         roomGameTimerGO.SetActive(true);
         InvokeRepeating("Clock", 0, 1);
     }
@@ -594,6 +614,8 @@ public class UIManager : MonoBehaviour
 
         roomButtonLeft.SetActive(false);
         roomButtonLeft.SetActive(true);
+
+        roomGameTimerGO.SetActive(false);
         roomDifficultyDropDown.value = Constants.ROOM_DIFFICULTY_EASY;
         SetSelectedMapUI();
         roomDifficultyDropDown.interactable = true;

@@ -95,7 +95,7 @@ namespace SnakeServer
             }
             if (_currentMapP1[nextP1] == (int)MapObjects.WALL || _currentMapP1[nextP1] == (int)MapObjects.PLAYER)
             {
-                return Constants.GAME_WON_P2;
+                return Constants.GAME_LOST_P1;
             }
             else if(_currentMapP2[nextP2] == (int)MapObjects.WALL || _currentMapP2[nextP2] == (int)MapObjects.PLAYER)
             {

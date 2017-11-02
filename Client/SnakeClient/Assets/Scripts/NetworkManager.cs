@@ -35,13 +35,13 @@ public class NetworkManager : MonoBehaviour
     public void LoopConnect()
     {
 
-        //string ipaddr = "93.142.180.137";
+        //string ipaddr = "93.143.63.109";
         //IPAddress myAdd = IPAddress.Parse(ipaddr);
         //IPEndPoint endPoint = new IPEndPoint(myAdd, 50000);
 
         _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-        IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 100);
+        IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, 50000);
         _clientSocket.BeginConnect(endPoint, ConnectCallback, null);
     }
 
@@ -493,6 +493,17 @@ public class NetworkManager : MonoBehaviour
                         UnityThreadHelper.Dispatcher.Dispatch(() =>
                         {
                             networkHelper.ChangeMyDirection(ref direction);
+                        });
+                        break;
+                    }
+
+                case Messages.GAME_ENDED:
+                    {
+                        byte response = data[0];
+
+                        UnityThreadHelper.Dispatcher.Dispatch(() =>
+                        {
+                            networkHelper.GameEnded(ref response);
                         });
                         break;
                     }

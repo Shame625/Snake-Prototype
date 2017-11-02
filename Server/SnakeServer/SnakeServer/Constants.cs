@@ -83,9 +83,9 @@ namespace SnakeServer
 
         //Game constatns
         public static int ROOM_GAME_TIME_TO_START { get { return 10000; } }
-        public static int ROOM_GAME_TICKS_EASY { get { return 100; } }
-        public static int ROOM_GAME_TICKS_NORMAL { get { return 700; } }
-        public static int ROOM_GAME_TICKS_HARD { get { return 500; } }
+        public static int ROOM_GAME_TICKS_EASY { get { return 250; } }
+        public static int ROOM_GAME_TICKS_NORMAL { get { return 150; } }
+        public static int ROOM_GAME_TICKS_HARD { get { return 50; } }
         public static int ROOM_GAME_TIME_LIMIT { get { return 120000; } }
 
         public static UInt16 ROOM_GAME_STARTED_SUCCESS { get { return 0x0001; } }
@@ -97,8 +97,9 @@ namespace SnakeServer
         public static byte GAME_DIRECTION_RIGHT { get { return 0x03; } }
 
         public static byte GAME_WON_P1 { get { return 0x01; } }
-        public static byte GAME_WON_P2 { get { return 0x02; } }
+        public static byte GAME_LOST_P1 { get { return 0x02; } }
         public static byte GAME_DRAW { get { return 0x03; } }
+        public static byte GAME_ENDED { get { return 0xFF; } }
 
         //Chat system
         public static UInt16 CHAT_MSG_LENGTH_MAX { get { return 100; } }

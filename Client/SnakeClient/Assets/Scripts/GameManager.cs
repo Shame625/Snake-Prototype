@@ -82,36 +82,31 @@ public class GameManager : MonoBehaviour
         currentRoom.game._gameInProgress = true;
     }
 
-    private float _timer = 0f;
+
+    public byte prevDirection = Constants.GAME_DIRECTION_LEFT;
 
     private void Update()
     {
-        _timer += Time.deltaTime;
-
-        if (_timer > 0.015f)
-        {
             //This must be sent to server!
             if (currentRoom.game._gameInProgress)
             {
-                if (Input.GetKeyDown(KeyCode.W))
+                if (Input.GetKeyDown(KeyCode.W) && (prevDirection != Constants.GAME_DIRECTION_DOWN))
                 {
                     functions.DirectionChanged(Constants.GAME_DIRECTION_UP);
                 }
-                else if (Input.GetKeyDown(KeyCode.S))
+                else if (Input.GetKeyDown(KeyCode.S) && (prevDirection != Constants.GAME_DIRECTION_UP))
                 {
-                    functions.DirectionChanged(Constants.GAME_DIRECTION_DOWN);
+                    functions.DirectionChanged(Constants.GAME_DIRECTION_DOWN );
                 }
-                else if (Input.GetKeyDown(KeyCode.A))
+                else if (Input.GetKeyDown(KeyCode.A) && (prevDirection != Constants.GAME_DIRECTION_RIGHT ))
                 {
                     functions.DirectionChanged(Constants.GAME_DIRECTION_LEFT);
                 }
-                else if (Input.GetKeyDown(KeyCode.D))
+                else if (Input.GetKeyDown(KeyCode.D) && (prevDirection != Constants.GAME_DIRECTION_LEFT))
                 {
                     functions.DirectionChanged(Constants.GAME_DIRECTION_RIGHT);
                 }
             }
-            _timer = 0;
-        }
     }
 
     public void GameLoop()
@@ -163,6 +158,24 @@ public class GameManager : MonoBehaviour
             Destroy(children.gameObject);
         }
 
+        foreach(GameObject go in player1Blocks)
+        {
+            Destroy(go);
+        }
+        foreach (GameObject go in player2Blocks)
+        {
+            Destroy(go);
+        }
+
+        player1Blocks.Clear();
+        player2Blocks.Clear();
+
+        if (player1Bug != null)
+            Destroy(player1Bug);
+
+        if(player2Bug != null)
+            Destroy(player2Bug);
+
         //Spawning map
 
         //Floor tile
@@ -197,6 +210,8 @@ public class GameManager : MonoBehaviour
 
         player1Bug = (GameObject)Instantiate(bugPrefabPlayer, new Vector3(currentRoom.game._selectedMap.spawnPoint.x, -20, -currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
         player2Bug = (GameObject)Instantiate(bugPrefabOpponent, new Vector3(currentRoom.game._selectedMap.spawnPoint.x, -20, -currentRoom.game._selectedMap.spawnPoint.y), Quaternion.identity);
+
+        prevDirection = Constants.GAME_DIRECTION_LEFT;
 
         Camera.main.transform.position = new Vector3(currentRoom.game._selectedMap._xSize / 2, Camera.main.transform.position.y, - currentRoom.game._selectedMap._ySize / 2);
     }

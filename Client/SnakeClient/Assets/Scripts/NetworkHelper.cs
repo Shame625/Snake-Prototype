@@ -329,6 +329,8 @@ public class NetworkHelper : MonoBehaviour
         gameManager.currentRoom.game.bugLocationP1 = bugLocationP1;
         gameManager.currentRoom.game.bugLocationP2 = bugLocationP2;
 
+        gameManager.prevDirection = gameManager.currentRoom.game.P1Direction;
+
         gameManager.GameLoop();
     }
 
@@ -336,6 +338,32 @@ public class NetworkHelper : MonoBehaviour
     {
         gameManager.currentRoom.game.P1Direction = direction;
         Debug.Log(gameManager.currentRoom.game.P1Direction);
+    }
+
+    public void GameEnded(ref byte response)
+    {
+        if(response == Constants.GAME_DRAW)
+        {
+            uiManager.ShowErrorPanel(Constants.GAME_DRAW_MSG);
+        }
+        else if (response == Constants.GAME_WON_P1)
+        {
+            uiManager.ShowErrorPanel(Constants.GAME_WON_MSG);
+        }
+        else if (response == Constants.GAME_LOST_P1)
+        {
+            uiManager.ShowErrorPanel(Constants.GAME_LOST_MSG);
+        }
+        else if (response == Constants.GAME_ENDED)
+        {
+            uiManager.ShowErrorPanel(Constants.GAME_ENDED_MSG);
+        }
+
+        //clean up
+        gameManager.player._findingRoom = false;
+        gameManager.player._inRoom = false;
+        uiManager.DisplayVsPlayerPanelUI();
+        gameManager.currentRoom.game.ClearGame();
     }
 
     public string PrintBytes(ref byte[] byteArray)

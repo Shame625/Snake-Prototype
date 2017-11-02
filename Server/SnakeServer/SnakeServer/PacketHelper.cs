@@ -29,7 +29,7 @@ namespace SnakeServer
             return (6, data);
         }
 
-        public (byte, byte[]) ByteToBytes(UInt16 msg, byte resp)
+        public (UInt16, byte[]) ByteToBytes(UInt16 msg, byte resp)
         {
             byte[] data = new byte[5];
 

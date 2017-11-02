@@ -41,7 +41,7 @@ namespace SnakeServer
             Console.WriteLine("---------------------------------------------------------");
             Console.WriteLine("Setting up server...");
 
-            _serverSocket.Bind(new IPEndPoint(IPAddress.Any, 100));
+            _serverSocket.Bind(new IPEndPoint(IPAddress.Any, 50000));
             _serverSocket.Listen(5);
             _serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
 
@@ -212,7 +212,6 @@ namespace SnakeServer
                                                 try
                                                 {
                                                     _publicRooms.Add(clientId, newRoom);
-                                                    roomHelper.PublicGamesTick(newRoom);
                                                 }
                                                 catch
                                                 {
@@ -707,6 +706,33 @@ namespace SnakeServer
            
         }
 
+        public static void GameEnded(ref byte[] dataToSendP1, ref byte[] dataToSendP2, Room r)
+        {
+            //player 1
+            try
+            {
+                r._roomAdmin._socket.BeginSend(dataToSendP1, 0, dataToSendP1.Length, SocketFlags.None, new AsyncCallback(SendCallback), r._roomAdmin._socket);
+                r._roomAdmin.ClearStatus();
+            }
+            catch
+            {
+
+            }
+
+            try
+            {
+                r.refClients[1]._socket.BeginSend(dataToSendP2, 0, dataToSendP2.Length, SocketFlags.None, new AsyncCallback(SendCallback), r.refClients[1]._socket);
+                r.refClients[1].ClearStatus();
+            }
+            catch
+            {
+
+            }
+            
+
+            roomHelper.DestroyRoom(r);
+        }
+
         public static (UInt16, byte[]) SendDataJoinedPrivateRoom(Room r, Client c)
         {
             byte[] dataToSendP1 = packetHelper.StringToBytes(Messages.ROOM_JOINED_MY_ROOM, c._userName);
@@ -916,7 +942,14 @@ namespace SnakeServer
                 {
                     SendDataPlayerLeftRoom(id);
                     _connectedClients[socket.GetHashCode()]._currentRoom.EndGame(0xFF);
-                    _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
+                    try
+                    {
+                        _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
 

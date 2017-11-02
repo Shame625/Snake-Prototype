@@ -117,21 +117,42 @@ namespace SnakeServer
 
             game.Reset();
             Console.WriteLine("game status: " + status);
+
+            byte[] dataToSendP1;
+            byte[] dataToSendP2;
+
             //send data of game status to players
-            if(status == Constants.GAME_DRAW)
+            if (status == Constants.GAME_DRAW)
             {
                 Console.WriteLine("Game ID:" + _roomId + " ended. DRAW!");
+
+                (_, dataToSendP1) = packetHelper.ByteToBytes(Messages.GAME_ENDED, Constants.GAME_DRAW);
+                Program.GameEnded(ref dataToSendP1, ref dataToSendP1, this);
+
             }
             else if (status == Constants.GAME_WON_P1)
             {
                 Console.WriteLine("Game ID:" + _roomId + " ended. P1 Won!");
+                (_, dataToSendP1) = packetHelper.ByteToBytes(Messages.GAME_ENDED, Constants.GAME_WON_P1);
+                (_, dataToSendP2) = packetHelper.ByteToBytes(Messages.GAME_ENDED, Constants.GAME_LOST_P1);
+
+                Program.GameEnded(ref dataToSendP1, ref dataToSendP2, this);
             }
-            else if (status == Constants.GAME_WON_P2)
+            else if (status == Constants.GAME_LOST_P1)
             {
                 Console.WriteLine("Game ID:" + _roomId + " ended. P2 Won!");
+                (_, dataToSendP1) = packetHelper.ByteToBytes(Messages.GAME_ENDED, Constants.GAME_LOST_P1);
+                (_, dataToSendP2) = packetHelper.ByteToBytes(Messages.GAME_ENDED, Constants.GAME_WON_P1);
+
+                Program.GameEnded(ref dataToSendP1, ref dataToSendP2, this);
             }
             else
+            {
                 Console.WriteLine("Game ID:" + _roomId + " ended.");
+
+                (_, dataToSendP1) = packetHelper.ByteToBytes(Messages.GAME_ENDED, Constants.GAME_ENDED);
+                Program.GameEnded(ref dataToSendP1, ref dataToSendP1, this);
+            } 
         }
 
         int preparation = 4;
