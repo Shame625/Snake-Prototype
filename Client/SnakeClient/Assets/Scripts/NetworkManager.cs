@@ -35,7 +35,7 @@ public class NetworkManager : MonoBehaviour
     public void LoopConnect()
     {
 
-        //string ipaddr = "93.143.63.109";
+        //string ipaddr = "78.3.27.29";
         //IPAddress myAdd = IPAddress.Parse(ipaddr);
         //IPEndPoint endPoint = new IPEndPoint(myAdd, 50000);
 

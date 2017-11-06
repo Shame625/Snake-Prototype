@@ -90,19 +90,19 @@ public class GameManager : MonoBehaviour
             //This must be sent to server!
             if (currentRoom.game._gameInProgress)
             {
-                if (Input.GetKeyDown(KeyCode.W) && (prevDirection != Constants.GAME_DIRECTION_DOWN))
+                if (Input.GetAxis("Vertical") > 0 && (prevDirection != Constants.GAME_DIRECTION_DOWN))
                 {
                     functions.DirectionChanged(Constants.GAME_DIRECTION_UP);
                 }
-                else if (Input.GetKeyDown(KeyCode.S) && (prevDirection != Constants.GAME_DIRECTION_UP))
+                else if (Input.GetAxis("Vertical") < 0 && (prevDirection != Constants.GAME_DIRECTION_UP))
                 {
                     functions.DirectionChanged(Constants.GAME_DIRECTION_DOWN );
                 }
-                else if (Input.GetKeyDown(KeyCode.A) && (prevDirection != Constants.GAME_DIRECTION_RIGHT ))
+                else if (Input.GetAxis("Horizontal") < 0 && (prevDirection != Constants.GAME_DIRECTION_RIGHT ))
                 {
                     functions.DirectionChanged(Constants.GAME_DIRECTION_LEFT);
                 }
-                else if (Input.GetKeyDown(KeyCode.D) && (prevDirection != Constants.GAME_DIRECTION_LEFT))
+                else if (Input.GetAxis("Horizontal") > 0 && (prevDirection != Constants.GAME_DIRECTION_LEFT))
                 {
                     functions.DirectionChanged(Constants.GAME_DIRECTION_RIGHT);
                 }

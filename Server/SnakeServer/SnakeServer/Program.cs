@@ -598,28 +598,36 @@ namespace SnakeServer
         {
             byte[] dataToSend = packetHelper.UInt16ToBytesNoLen(Messages.USER_DISCONNECT, Constants.FORCED_DISCONNECT);
 
-            if (_connectedClients[socket.GetHashCode()]._currentRoom != null)
+            try
             {
-                int id = _connectedClients[socket.GetHashCode()]._currentRoom._roomAdmin._clientId;
 
-                //if user is admin, kick other guy
-                if (socket.GetHashCode() == id)
+                if (_connectedClients[socket.GetHashCode()]._currentRoom != null)
                 {
-                    Room r = _connectedClients[socket.GetHashCode()]._currentRoom;
-                    try
+                    int id = _connectedClients[socket.GetHashCode()]._currentRoom._roomAdmin._clientId;
+
+                    //if user is admin, kick other guy
+                    if (socket.GetHashCode() == id)
                     {
-                        SendDataRoomAbandoned(_connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._socket, _connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._clientId);
-                    }
-                    catch
-                    { }
+                        Room r = _connectedClients[socket.GetHashCode()]._currentRoom;
+                        try
+                        {
+                            SendDataRoomAbandoned(_connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._socket, _connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._clientId);
+                        }
+                        catch
+                        { }
 
-                    roomHelper.DestroyRoom(r);
+                        roomHelper.DestroyRoom(r);
+                    }
+                    else
+                    {
+                        SendDataPlayerLeftRoom(id);
+                        _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
+                    }
                 }
-                else
-                {
-                    SendDataPlayerLeftRoom(id);
-                    _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
-                }
+            }
+            catch
+            {
+
             }
             try
             {
@@ -920,37 +928,44 @@ namespace SnakeServer
         {
             Console.WriteLine("Date / Time: " + DateTime.Now);
 
-            if(_connectedClients[socket.GetHashCode()]._currentRoom != null)
+            try
             {
-                int id = _connectedClients[socket.GetHashCode()]._currentRoom._roomAdmin._clientId;
-
-                //if user is admin, kick other guy
-                if (socket.GetHashCode() == id)
+                if (_connectedClients[socket.GetHashCode()]._currentRoom != null)
                 {
-                    Room r = _connectedClients[socket.GetHashCode()]._currentRoom;
-                    try
-                    {
-                        SendDataRoomAbandoned(_connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._socket, _connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._clientId);
-                    }
-                    catch
-                    {
+                    int id = _connectedClients[socket.GetHashCode()]._currentRoom._roomAdmin._clientId;
 
-                    }
-                    roomHelper.DestroyRoom(r);
-                }
-                else
-                {
-                    SendDataPlayerLeftRoom(id);
-                    _connectedClients[socket.GetHashCode()]._currentRoom.EndGame(0xFF);
-                    try
+                    //if user is admin, kick other guy
+                    if (socket.GetHashCode() == id)
                     {
-                        _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
-                    }
-                    catch
-                    {
+                        Room r = _connectedClients[socket.GetHashCode()]._currentRoom;
+                        try
+                        {
+                            SendDataRoomAbandoned(_connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._socket, _connectedClients[socket.GetHashCode()]._currentRoom.refClients[1]._clientId);
+                        }
+                        catch
+                        {
 
+                        }
+                        roomHelper.DestroyRoom(r);
+                    }
+                    else
+                    {
+                        SendDataPlayerLeftRoom(id);
+                        _connectedClients[socket.GetHashCode()]._currentRoom.EndGame(0xFF);
+                        try
+                        {
+                            _connectedClients[socket.GetHashCode()]._currentRoom.RemovePlayer2();
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
+            }
+            catch
+            {
+
             }
 
             if (_connectedClients.ContainsKey(socket.GetHashCode()))

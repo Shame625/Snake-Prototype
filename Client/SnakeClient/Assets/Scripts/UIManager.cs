@@ -324,6 +324,8 @@ public class UIManager : MonoBehaviour
     {
         player2.text = gameManager.opponent._userName;
         player2LoadingBar.SetActive(false);
+        ResetClockUI();
+        GameInitiatedUI();
     }
 
     public void JoinedRoomUI()
